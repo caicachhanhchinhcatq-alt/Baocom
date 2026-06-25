@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hệ thống Quản lý và Báo cơm Tập thể CAND</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script>
+        // Tải giao diện Sáng/Tối ngay lập tức để tránh nháy màn hình
+        const savedTheme = localStorage.getItem('app-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
     <style>
         :root {
             --cand-red: #b71c1c;      
@@ -14,22 +20,55 @@
             --cand-gold-dark: #f57f17;
             --success: #2e7d32;
             
-            --status-none: #ffffff;    
             --status-lunch: #1565c0;   
             --status-dinner: #6a1b9a;  
             --status-both: #e53935;    
-            --past-bg: #e0e0e0;        
+            
+            /* Giao diện sáng mặc định */
+            --bg-color: #f4f6f9;
+            --text-main: #212121;
+            --text-muted: #666666;
+            --card-bg: #ffffff;
+            --card-alt-bg: #fafafa;
+            --border-color: #e0e0e0;
+            --input-border: #bcbcbc;
+            --input-bg: #ffffff;
+            --past-bg: #e0e0e0;
             --future-eat: #e8f5e9;
             --future-none: #fafafa;
+            --alert-bg: #fffde7;
+            --note-bg: #eeeeee;
+            --table-header-bg: #f5f5f5;
+            --status-none: #ffffff;
+        }
+
+        /* Giao diện tối (Dark Mode) */
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-main: #e0e0e0;
+            --text-muted: #aaaaaa;
+            --card-bg: #1e1e1e;
+            --card-alt-bg: #2a2a2a;
+            --border-color: #333333;
+            --input-border: #555555;
+            --input-bg: #2d2d2d;
+            --past-bg: #333333;
+            --future-eat: #1b3320;
+            --future-none: #2d2d2d;
+            --alert-bg: #33301a;
+            --note-bg: #2d2d2d;
+            --table-header-bg: #2d2d2d;
+            --status-none: #1e1e1e;
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
         
         body { 
-            background-color: #f4f6f9;
-            color: #212121;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             padding-bottom: 80px;
             -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         header { 
@@ -39,19 +78,41 @@
             text-align: center; 
             border-bottom: 4px solid var(--cand-gold);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative;
         }
         header h1 { font-size: 20px; font-weight: bold; letter-spacing: 0.5px; text-shadow: 1px 1px 2px #000; }
         header p { margin-top: 6px; font-size: 13px; color: var(--cand-gold); font-weight: 500; min-height: 18px; }
 
+        .theme-toggle-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--cand-gold);
+            color: var(--cand-gold);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle-btn:active { transform: translateY(-50%) scale(0.9); }
+
         .container { max-width: 850px; margin: 12px auto; padding: 0 12px; }
         
         .card { 
-            background: #ffffff; 
+            background: var(--card-bg); 
             padding: 18px; 
             border-radius: 8px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
             margin-bottom: 15px; 
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .card h2 { 
             font-size: 15px; 
@@ -67,8 +128,8 @@
         }
 
         .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 13px; color: #333; }
-        .form-control { width: 100%; padding: 10px 12px; border: 1px solid #bcbcbc; border-radius: 4px; font-size: 14px; background-color: #fff; transition: border-color 0.2s; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 13px; color: var(--text-main); transition: color 0.3s ease; }
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--input-border); border-radius: 4px; font-size: 14px; background-color: var(--input-bg); color: var(--text-main); transition: all 0.3s ease; }
         .form-control:focus { border-color: var(--cand-red); outline: none; }
         
         .btn-grid-quick {
@@ -89,80 +150,84 @@
         .btn-success:hover { background-color: #1b5e20; }
         .btn-gold { background-color: var(--cand-gold); color: #212121; }
         .btn-gold:hover { background-color: var(--cand-gold-dark); }
-        .btn-outline { background-color: #fff; border: 1px solid var(--cand-red); color: var(--cand-red); }
+        .btn-outline { background-color: var(--card-bg); border: 1px solid var(--cand-red); color: var(--cand-red); }
         .btn-outline:hover { background-color: #ffebee; }
         .btn-clear { background-color: #757575; color: white; }
         .btn-clear:hover { background-color: #616161; }
 
-        .nav-tabs { display: none; justify-content: space-around; background: white; position: fixed; bottom: 0; left: 0; right: 0; border-top: 3px solid var(--cand-gold); box-shadow: 0 -3px 10px rgba(0,0,0,0.1); z-index: 999; }
-        .tab-item { padding: 14px 5px; text-align: center; flex: 1; cursor: pointer; font-size: 12px; font-weight: bold; color: #616161; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-tabs { display: none; justify-content: space-around; background: var(--card-bg); position: fixed; bottom: 0; left: 0; right: 0; border-top: 3px solid var(--cand-gold); box-shadow: 0 -3px 10px rgba(0,0,0,0.1); z-index: 999; transition: background-color 0.3s ease; }
+        .tab-item { padding: 14px 5px; text-align: center; flex: 1; cursor: pointer; font-size: 12px; font-weight: bold; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.3s ease; }
         .tab-item i { font-size: 16px; }
-        .tab-item.active { color: var(--cand-red); background-color: #ffebee; }
+        .tab-item.active { color: var(--cand-red); background-color: rgba(183, 28, 28, 0.1); }
 
-        .view-panel { display: none; }
+        .view-panel { display: none; animation: fadeUp 0.3s ease-out; }
         .view-panel.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
         .calendar-day-head { font-weight: bold; font-size: 12px; padding: 8px 0; color: white; background-color: var(--cand-red); border-radius: 3px; }
         
-        .calendar-cell { padding: 4px 2px; font-size: 13px; font-weight: bold; border-radius: 4px; background-color: #fff; border: 1px solid #ccc; cursor: pointer; user-select: none; min-height: 48px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transition: all 0.1s; overflow: hidden; }
+        .calendar-cell { padding: 4px 2px; font-size: 13px; font-weight: bold; border-radius: 4px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; user-select: none; min-height: 48px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transition: all 0.2s ease; overflow: hidden; }
+        .calendar-cell:active { transform: scale(0.92); }
         .calendar-cell .day-num { margin-bottom: 2px; }
         .calendar-cell .day-status { font-size: 9px; padding: 2px 0; border-radius: 2px; color: white; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: normal; line-height: 1.1; font-weight: bold; box-sizing: border-box; }
         
-        .cell-none { background-color: var(--status-none); color: #333; }
-        .cell-lunch { background-color: #e3f2fd; color: var(--status-lunch); border-color: var(--status-lunch); }
-        .cell-lunch .day-status { background-color: var(--status-lunch); }
-        .cell-dinner { background-color: #f3e5f5; color: var(--status-dinner); border-color: var(--status-dinner); }
-        .cell-dinner .day-status { background-color: var(--status-dinner); }
-        .cell-both { background-color: #ffebee; color: var(--status-both); border-color: var(--status-both); }
-        .cell-both .day-status { background-color: var(--status-both); }
+        .cell-none { background-color: var(--status-none); }
+        .cell-lunch { background-color: rgba(21, 101, 192, 0.15); color: var(--status-lunch); border-color: var(--status-lunch); }
+        .cell-lunch .day-status { background-color: var(--status-lunch); color: white; }
+        .cell-dinner { background-color: rgba(106, 27, 154, 0.15); color: var(--status-dinner); border-color: var(--status-dinner); }
+        .cell-dinner .day-status { background-color: var(--status-dinner); color: white; }
+        .cell-both { background-color: rgba(229, 57, 53, 0.15); color: var(--status-both); border-color: var(--status-both); }
+        .cell-both .day-status { background-color: var(--status-both); color: white; }
         
-        .calendar-cell.past-day { background-color: var(--past-bg) !important; color: #777 !important; border-color: #ccc; cursor: not-allowed; }
+        .calendar-cell.past-day { background-color: var(--past-bg) !important; color: var(--text-muted) !important; border-color: var(--border-color); cursor: not-allowed; }
+        .calendar-cell.past-day:active { transform: none; }
         .calendar-cell.past-day .day-status { background-color: #9e9e9e !important; color: #fff !important; }
-        .calendar-cell.today { border: 2px solid #000; box-shadow: inset 0 0 4px rgba(0,0,0,0.2); }
-        .calendar-cell.today-locked { background-color: #eaeaea !important; color: #666; border: 2px dashed #777; cursor: not-allowed; }
+        .calendar-cell.today { border: 2px solid var(--text-main); box-shadow: inset 0 0 4px rgba(0,0,0,0.2); }
+        .calendar-cell.today-locked { background-color: var(--past-bg) !important; color: var(--text-muted); border: 2px dashed var(--text-muted); cursor: not-allowed; }
         .calendar-cell.today-locked .day-status { background-color: #888 !important; }
         
-        .history-cell-eat { background-color: #ffebee !important; color: #c62828 !important; border-color: #e53935 !important; }
-        .history-cell-eat .day-status { background-color: #e53935 !important; color: white !important; }
-        .history-cell-none { background-color: #f5f5f5 !important; color: #777 !important; border-color: #dcdcdc !important; }
+        .history-cell-eat { background-color: rgba(229, 57, 53, 0.15) !important; color: var(--cand-red) !important; border-color: var(--cand-red-light) !important; }
+        .history-cell-eat .day-status { background-color: var(--cand-red-light) !important; color: white !important; }
+        .history-cell-none { background-color: var(--past-bg) !important; color: var(--text-muted) !important; border-color: var(--border-color) !important; }
         .history-cell-none .day-status { background-color: #9e9e9e !important; color: white !important; }
         
-        .history-cell-fut-eat { background-color: #e8f5e9 !important; color: #2e7d32 !important; border-color: #4caf50 !important; border-style: dashed !important; }
+        .history-cell-fut-eat { background-color: var(--future-eat) !important; color: var(--success) !important; border-color: #4caf50 !important; border-style: dashed !important; }
         .history-cell-fut-eat .day-status { background-color: #4caf50 !important; color: white !important; }
-        .history-cell-fut-none { background-color: #ffffff !important; color: #9e9e9e !important; border-color: #ccc !important; border-style: dashed !important; }
+        .history-cell-fut-none { background-color: var(--future-none) !important; color: var(--text-muted) !important; border-color: var(--border-color) !important; border-style: dashed !important; }
         .history-cell-fut-none .day-status { background-color: #bdbdbd !important; color: white !important; }
 
-        .calendar-note { display: flex; gap: 8px; justify-content: center; font-size: 11px; margin-top: 10px; flex-wrap: wrap; background: #eee; padding: 8px; border-radius: 5px; }
-        .note-box { width: 12px; height: 12px; border-radius: 2px; display: inline-block; vertical-align: middle; margin-right: 3px; border: 1px solid #ccc; }
+        .calendar-note { display: flex; gap: 8px; justify-content: center; font-size: 11px; margin-top: 10px; flex-wrap: wrap; background: var(--note-bg); padding: 8px; border-radius: 5px; transition: background-color 0.3s ease; }
+        .note-box { width: 12px; height: 12px; border-radius: 2px; display: inline-block; vertical-align: middle; margin-right: 3px; border: 1px solid var(--border-color); }
 
-        .alert-info { background-color: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 4px; font-size: 13px; margin-bottom: 12px; border-left: 4px solid #1e88e5; line-height: 1.5; }
+        .alert-info { background-color: var(--alert-bg); color: var(--text-main); padding: 12px; border-radius: 4px; font-size: 13px; margin-bottom: 12px; border-left: 4px solid #1e88e5; line-height: 1.5; transition: background-color 0.3s ease, color 0.3s ease; }
         .alert-loading { background-color: var(--cand-gold); color: #000; padding: 10px; border-radius: 4px; font-size: 13px; text-align: center; font-weight: bold; margin-bottom: 12px; display: none; }
         
-        .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #ccc; margin-top: 8px; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; background-color: white; }
-        table th, table td { border: 1px solid #bcbcbc; padding: 6px 8px; text-align: center; white-space: nowrap; }
-        table th { background-color: #f5f5f5; color: #333; font-weight: bold; }
-        .th-sticky { position: sticky; left: 0; background-color: #eaeaea; font-weight: bold; z-index: 2; }
-        .td-sticky { position: sticky; left: 0; background-color: #fff; font-weight: bold; z-index: 1; text-align: left; }
+        .table-responsive { width: 100%; overflow-x: auto; border: 1px solid var(--border-color); margin-top: 8px; border-radius: 4px; transition: border-color 0.3s ease; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; background-color: var(--card-bg); transition: background-color 0.3s ease; }
+        table th, table td { border: 1px solid var(--border-color); padding: 6px 8px; text-align: center; white-space: nowrap; transition: border-color 0.3s ease; }
+        table th { background-color: var(--table-header-bg); color: var(--text-main); font-weight: bold; transition: background-color 0.3s ease, color 0.3s ease; }
+        .th-sticky { position: sticky; left: 0; background-color: var(--table-header-bg); font-weight: bold; z-index: 2; }
+        .td-sticky { position: sticky; left: 0; background-color: var(--card-bg); color: var(--text-main); font-weight: bold; z-index: 1; text-align: left; }
         
-        .matrix-lunch { background-color: #e3f2fd; color: var(--status-lunch); font-weight: bold; }
-        .matrix-dinner { background-color: #f3e5f5; color: var(--status-dinner); font-weight: bold; }
-        .matrix-both { background-color: #ffebee; color: var(--status-both); font-weight: bold; }
+        .matrix-lunch { background-color: rgba(21, 101, 192, 0.15); color: var(--status-lunch); font-weight: bold; }
+        .matrix-dinner { background-color: rgba(106, 27, 154, 0.15); color: var(--status-dinner); font-weight: bold; }
+        .matrix-both { background-color: rgba(229, 57, 53, 0.15); color: var(--status-both); font-weight: bold; }
 
         .login-sub-card {
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 12px;
-            background: #fafafa;
+            background: var(--card-alt-bg);
             margin-bottom: 15px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .login-sub-title {
             font-size: 13px;
             font-weight: bold;
             color: var(--cand-red);
             margin-bottom: 10px;
-            border-bottom: 1px solid #e8e8e8;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 4px;
             display: flex;
             align-items: center;
@@ -176,28 +241,6 @@
             margin-bottom: 12px;
             gap: 10px;
         }
-        .month-btn-group {
-            display: flex;
-            gap: 4px;
-            flex: 1;
-        }
-        .month-toggle-btn {
-            flex: 1;
-            padding: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            border: 1px solid #ccc;
-            background-color: #f5f5f5;
-            cursor: pointer;
-            text-align: center;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        .month-toggle-btn.active {
-            background-color: var(--cand-red);
-            color: white;
-            border-color: var(--cand-red);
-        }
 
         .admin-dashboard-grid {
             display: grid;
@@ -209,21 +252,32 @@
             .admin-dashboard-grid { grid-template-columns: 1fr; }
         }
         .admin-stat-card {
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 12px;
             text-align: left;
-            background: #fff;
+            background: var(--card-bg);
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            transition: all 0.3s ease;
         }
-        .admin-stat-card.yesterday { border-left: 4px solid #757575; background: #fafafa; }
-        .admin-stat-card.today { border-left: 4px solid var(--cand-red); background: #fffde7; }
-        .admin-stat-card.tomorrow { border-left: 4px solid var(--success); background: #e8f5e9; }
-        .admin-stat-title { font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 4px; }
-        .admin-stat-val { font-size: 16px; font-weight: bold; color: #111; margin-bottom: 6px; }
+        .admin-stat-card.yesterday { border-left: 4px solid var(--text-muted); background: var(--card-alt-bg); }
+        .admin-stat-card.today { border-left: 4px solid var(--cand-red); background: var(--alert-bg); }
+        .admin-stat-card.tomorrow { border-left: 4px solid var(--success); background: var(--future-eat); }
+        .admin-stat-title { font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .admin-stat-val { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 6px; }
+
+        /* Animation nhắc nhở lưu thông minh */
+        .pulse-alert {
+            animation: pulseRed 1.5s infinite;
+        }
+        @keyframes pulseRed {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(183, 28, 28, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(183, 28, 28, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(183, 28, 28, 0); }
+        }
 
         @keyframes slideIn {
             from { transform: translateX(120%); opacity: 0; }
@@ -239,6 +293,10 @@
     <header id="mainHeader">
         <h1 id="headerTitle">HỆ THỐNG BÁO CƠM TẬP THỂ CAND</h1>
         <p id="headerUser"></p>
+        <!-- Nút gạt Dark Mode / Light Mode -->
+        <button class="theme-toggle-btn" onclick="toggleTheme()">
+            <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
     </header>
 
     <div class="container">
@@ -253,7 +311,7 @@
                     <div class="login-sub-title">
                         <i class="fa-solid fa-user-check"></i> ĐỒNG CHÍ ĐÃ CÓ TÀI KHOẢN
                     </div>
-                    <p style="font-size: 11px; color: #666; margin-bottom: 10px; font-style: italic;">
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
                         * Chỉ điền số điện thoại đã đăng ký để truy cập nhanh:
                     </p>
                     <div class="form-group">
@@ -267,7 +325,7 @@
                     <div class="login-sub-title">
                         <i class="fa-solid fa-user-plus"></i> ĐỒNG CHÍ ĐĂNG KÝ MỚI LẦN ĐẦU
                     </div>
-                    <p style="font-size: 11px; color: #666; margin-bottom: 10px; font-style: italic;">
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
                         * Cần điền đầy đủ cả 3 thông tin để khởi tạo hồ sơ mới:
                     </p>
                     <div class="form-group">
@@ -312,17 +370,17 @@
 
         <!-- PANEL ĐĂNG KÝ BÁO CƠM -->
         <div id="panel-report" class="view-panel">
-            <div class="card" style="border-left: 4px solid var(--cand-red); background-color: #fafafa;">
+            <div class="card" style="border-left: 4px solid var(--cand-red); background-color: var(--card-alt-bg);">
                 <h2>📌 Hướng Dẫn Thao Tác Chi Tiết</h2>
-                <div style="font-size: 12px; color: #333; line-height: 1.5;">
+                <div style="font-size: 12px; color: var(--text-main); line-height: 1.5;">
                     • <b>Đăng ký theo ngày:</b> Chạm liên tục vào ô ngày trong tương lai để đổi trạng thái xoay vòng:<br>
-                    &nbsp;&nbsp;[Màu Trắng]: Cắt cơm ➔ [Màu Xanh]: Chỉ ăn Trưa ➔ [Màu Tím]: Chỉ ăn Tối ➔ [Màu Đỏ]: Ăn cả 2 bữa.<br>
+                    &nbsp;&nbsp;[Màu Xám]: Cắt cơm ➔ [Màu Xanh]: Chỉ ăn Trưa ➔ [Màu Tím]: Chỉ ăn Tối ➔ [Màu Đỏ]: Ăn cả 2 bữa.<br>
                     • <b>Đăng ký nhanh:</b> Áp dụng cấu hình nhanh hàng loạt cho cả tháng.<br>
                     • <b>Lưu ý cực kỳ quan trọng:</b> Thao tác xong bắt buộc ấn nút đỏ <b>"CẬP NHẬT LÊN HỆ THỐNG TRUNG TÂM"</b> ở dưới cùng.
                 </div>
             </div>
 
-            <div class="card" style="background-color: #fffde7; border: 1px solid var(--cand-gold);">
+            <div class="card" style="background-color: var(--alert-bg); border: 1px solid var(--cand-gold);">
                 <h2>⚡ Đăng Ký Nhanh (Tự Động Trừ Thứ 7, Chủ Nhật)</h2>
                 <div class="btn-grid-quick">
                     <button class="btn btn-success" onclick="setQuickEatMode('BOTH')">🔔 Đăng ký cả Trưa + Tối</button>
@@ -339,11 +397,17 @@
                 </select>
             </div>
 
-            <!-- CHÈN THÊM LƯỚI LỊCH BÁO CƠM BỊ THIẾU -->
             <div class="card">
                 <h2 id="calendarTitle">LỊCH ĐĂNG KÝ BÁO CƠM THÁNG</h2>
                 <div id="calendarGrid" class="calendar-grid"></div>
-                <button class="btn btn-primary" style="margin-top: 15px; font-size: 14px; padding: 14px; background-color: var(--cand-red);" onclick="uploadCalendarToSystem()">
+                <div class="calendar-note">
+                    <span><span class="note-box" style="background-color: rgba(21, 101, 192, 0.15); border-color: var(--status-lunch);"></span>Trưa</span>
+                    <span><span class="note-box" style="background-color: rgba(106, 27, 154, 0.15); border-color: var(--status-dinner);"></span>Tối</span>
+                    <span><span class="note-box" style="background-color: rgba(229, 57, 53, 0.15); border-color: var(--status-both);"></span>Cả hai</span>
+                    <span><span class="note-box" style="background-color: var(--card-bg);"></span>Cắt cơm</span>
+                    <span><span class="note-box" style="background-color: var(--past-bg);"></span>Quá khứ / Khóa</span>
+                </div>
+                <button id="btn-update-server" class="btn btn-primary" style="margin-top: 15px; font-size: 14px; padding: 14px; background-color: var(--cand-red); transition: all 0.3s ease;" onclick="uploadCalendarToSystem()">
                     <i class="fa-solid fa-cloud-arrow-up"></i> CẬP NHẬT LÊN HỆ THỐNG TRUNG TÂM
                 </button>
             </div>
@@ -353,11 +417,11 @@
             </div>
         </div>
 
-        <!-- BỔ SUNG PANEL LỊCH SỬ VÀ THỐNG KÊ HOÀN CHỈNH BỊ THIẾU -->
+        <!-- PANEL LỊCH SỬ VÀ THỐNG KÊ -->
         <div id="panel-history" class="view-panel">
             <div class="month-selector-container">
-                <label style="font-size: 14px; font-weight: bold; color: #1565c0; flex: 1;">Tra cứu tháng:</label>
-                <select id="history-month-select" class="form-control" style="flex: 2; font-weight: bold; border-color: #1565c0;" onchange="fetchMonthHistoryFromServer()">
+                <label style="font-size: 14px; font-weight: bold; color: var(--status-lunch); flex: 1;">Tra cứu tháng:</label>
+                <select id="history-month-select" class="form-control" style="flex: 2; font-weight: bold; border-color: var(--status-lunch);" onchange="fetchMonthHistoryFromServer()">
                     <option value="6">Tháng 6 / 2026</option>
                     <option value="7">Tháng 7 / 2026</option>
                     <option value="8">Tháng 8 / 2026</option>
@@ -372,9 +436,9 @@
                 <h2><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Báo Cơm</h2>
                 <div id="historyStaticGrid" class="calendar-grid"></div>
                 <div class="calendar-note" style="margin-top: 15px;">
-                    <div><span class="note-box" style="background-color: #e53935; border-color: #e53935;"></span> Đã ăn</div>
-                    <div><span class="note-box" style="background-color: #4caf50; border-color: #4caf50;"></span> Sẽ ăn</div>
-                    <div><span class="note-box" style="background-color: #9e9e9e; border-color: #dcdcdc;"></span> Cắt cơm</div>
+                    <div><span class="note-box" style="background-color: rgba(229, 57, 53, 0.15); border-color: var(--cand-red-light);"></span> Đã ăn</div>
+                    <div><span class="note-box" style="background-color: var(--future-eat); border-color: #4caf50;"></span> Sẽ ăn</div>
+                    <div><span class="note-box" style="background-color: var(--past-bg); border-color: var(--border-color);"></span> Cắt cơm</div>
                 </div>
             </div>
 
@@ -385,8 +449,8 @@
                     <input type="number" id="meal-price" class="form-control" value="35000" oninput="calculateTotalMoney()">
                 </div>
                 
-                <div class="alert-info" style="background-color: #f1f8e9; color: #33691e; border-left-color: #7cb342; font-size: 13px;">
-                    <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #2e7d32;">
+                <div class="alert-info">
+                    <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: var(--success);">
                         <i class="fa-solid fa-receipt"></i> THỰC TẾ LỊCH SỬ ĐÃ ĂN TRONG THÁNG:
                     </div>
                     • Số suất ăn Trưa thực tế: <b id="count-lunch-real">0</b> bữa<br>
@@ -394,20 +458,20 @@
                     • Tổng số lượng bữa đã ăn: <b id="total-meals-real" style="color: var(--cand-red);">0</b> suất<br>
                     • THỰC TẾ CHI PHÍ ĐÃ ĂN: <b id="total-money-real" style="color: var(--cand-red); font-size: 15px;">0 đ</b>
                     
-                    <hr style="margin: 10px 0; border: 0; border-top: 1px dashed #7cb342;">
+                    <hr style="margin: 10px 0; border: 0; border-top: 1px dashed var(--success);">
                     
-                    <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #1565c0;">
+                    <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: var(--status-lunch);">
                         <i class="fa-solid fa-calendar-days"></i> DỰ KIẾN KẾ HOẠCH TƯƠNG LAI (Từ nay đến cuối tháng):
                     </div>
                     • Số suất ăn đăng ký Trưa: <b id="count-lunch-fut">0</b> bữa<br>
                     • Số suất ăn đăng ký Tối: <b id="count-dinner-fut">0</b> bữa<br>
-                    • Số lượng bữa đăng ký tương lai: <b id="total-meals-fut" style="color: #1565c0;">0</b> suất<br>
-                    • CHI PHÍ DỰ KIẾN PHÁT SINH: <b id="total-money-fut" style="color: #1565c0; font-size: 15px;">0 đ</b>
+                    • Số lượng bữa đăng ký tương lai: <b id="total-meals-fut" style="color: var(--status-lunch);">0</b> suất<br>
+                    • CHI PHÍ DỰ KIẾN PHÁT SINH: <b id="total-money-fut" style="color: var(--status-lunch); font-size: 15px;">0 đ</b>
                     
-                    <hr style="margin: 10px 0; border: 0; border-top: 1px solid #7cb342;">
+                    <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--success);">
                     
                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 15px;">
-                        <span>TỔNG TIỀN CƠM THÁNG NÀY (CẢ THÁNG):</span>
+                        <span style="color: var(--text-main);">TỔNG TIỀN CƠM (CẢ THÁNG):</span>
                         <b id="total-money" style="color: var(--cand-red); font-size: 18px; text-decoration: underline;">0 đ</b>
                     </div>
                 </div>
@@ -457,11 +521,11 @@
                 <div class="admin-dashboard-grid" id="adminQuickStats"></div>
 
                 <!-- FORM ĐỔI USERNAME / MẬT KHẨU ADMIN TRỰC TIẾP LÊN SHEET "admin" -->
-                <div class="login-sub-card" style="border: 2px solid #1e88e5; background-color: #f1f8e9;">
-                    <div class="login-sub-title" style="color: #0d47a1;">
+                <div class="login-sub-card" style="border: 2px solid var(--status-lunch); background-color: var(--card-bg);">
+                    <div class="login-sub-title" style="color: var(--status-lunch);">
                         <i class="fa-solid fa-user-gear"></i> THAY ĐỔI TÀI KHOẢN ADMIN (LƯU VÀO SHEET)
                     </div>
-                    <p style="font-size: 11px; color: #555; margin-bottom: 10px; font-style: italic;">
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
                         * Thông tin thay đổi dưới đây sẽ trực tiếp cập nhật vào trang tính `admin` của Google Sheets:
                     </p>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
@@ -480,11 +544,11 @@
                 </div>
 
                 <!-- FORM ADMIN NHẬP BỔ SUNG HOẶC TẠO TÀI KHẨN MỚI TRỰC TIẾP -->
-                <div class="login-sub-card" style="border: 2px solid var(--cand-gold-dark); background-color: #fffde7; margin-top: 15px;">
+                <div class="login-sub-card" style="border: 2px solid var(--cand-gold-dark); background-color: var(--alert-bg); margin-top: 15px;">
                     <div class="login-sub-title" style="color: var(--cand-red);">
                         <i class="fa-solid fa-user-plus"></i> ĐẶT SUẤT CƠM BỔ SUNG / KHỞI TẠO TÀI KHOẢN HỘ (QUA ZALO)
                     </div>
-                    <p style="font-size: 11px; color: #555; margin-bottom: 10px; font-style: italic;">
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
                         * Nếu số điện thoại này đã có trên Google Sheets, hệ thống sẽ tự động cập nhật ngày được chọn. Nếu chưa có, hệ thống sẽ tạo tài khoản mới với thông tin Họ tên, Đơn vị do Admin điền.
                     </p>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -523,18 +587,18 @@
 
                 <!-- MA TRẬN TOÀN ĐƠN VỊ -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 8px;">
-                    <h3 id="admin-matrix-title" style="font-size: 13px; color: #333; font-weight: bold; margin: 0;">
+                    <h3 id="admin-matrix-title" style="font-size: 13px; color: var(--text-main); font-weight: bold; margin: 0;">
                         <i class="fa-solid fa-table-cells"></i> Thống Kê Chi Tiết Báo Cơm
                     </h3>
                     <button class="btn btn-success" style="width: auto; padding: 6px 12px; font-size: 11px; display: flex; align-items: center; gap: 5px;" onclick="exportTableToExcel('matrix-table', 'ThongKeBepAn')">
                         <i class="fa-solid fa-file-excel"></i> Xuất Excel
                     </button>
                 </div>
-                <div style="font-size: 11px; margin-bottom: 8px; display: flex; gap: 10px; justify-content: flex-start; background: #eee; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                <div style="font-size: 11px; margin-bottom: 8px; display: flex; gap: 10px; justify-content: flex-start; background: var(--note-bg); padding: 8px; border-radius: 4px; border: 1px solid var(--border-color);">
                     <span><b style="color: var(--status-lunch);">Trưa</b>: Ăn Trưa</span>
                     <span><b style="color: var(--status-dinner);">Tối</b>: Ăn Tối</span>
                     <span><b style="color: var(--status-both);">Cả ngày</b>: Cả 2 Bữa</span>
-                    <span><b>-</b>: Cắt Cơm</span>
+                    <span style="color: var(--text-main);"><b>-</b>: Cắt Cơm</span>
                 </div>
                 <div class="table-responsive">
                     <table id="matrix-table">
@@ -551,32 +615,32 @@
 
     <!-- MODAL XEM CHI TIẾT DANH SÁCH BÁO CƠM NHANH (ADMIN) -->
     <div id="admin-people-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:11500; justify-content:center; align-items:center; padding:15px;">
-        <div style="background:white; border-radius:8px; max-width:500px; width:100%; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.3); border-top: 5px solid var(--cand-red);">
-            <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; border-top-left-radius:5px; border-top-right-radius:5px;">
+        <div style="background:var(--card-bg); border-radius:8px; max-width:500px; width:100%; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.3); border-top: 5px solid var(--cand-red);">
+            <div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--table-header-bg); border-top-left-radius:5px; border-top-right-radius:5px;">
                 <h3 style="margin:0; font-size:15px; color:var(--cand-red); display:flex; align-items:center; gap:8px;">
                     <i class="fa-solid fa-list-check"></i> <span id="admin-people-modal-title">Danh Sách Báo Cơm</span>
                 </h3>
-                <button onclick="closeAdminPeopleModal()" style="background:none; border:none; font-size:18px; cursor:pointer; color:#999;">
+                <button onclick="closeAdminPeopleModal()" style="background:none; border:none; font-size:18px; cursor:pointer; color:var(--text-muted);">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div id="admin-people-modal-body" style="padding:15px; overflow-y:auto; font-size:13px; line-height:1.6; color:#333; flex:1;"></div>
-            <div style="padding:12px 15px; border-top:1px solid #eee; text-align:right; background:#f9f9f9; border-bottom-left-radius:5px; border-bottom-right-radius:5px;">
+            <div id="admin-people-modal-body" style="padding:15px; overflow-y:auto; font-size:13px; line-height:1.6; color:var(--text-main); flex:1;"></div>
+            <div style="padding:12px 15px; border-top:1px solid var(--border-color); text-align:right; background:var(--table-header-bg); border-bottom-left-radius:5px; border-bottom-right-radius:5px;">
                 <button onclick="closeAdminPeopleModal()" class="btn btn-primary" style="width:auto; padding:6px 20px; font-size:12px;">Đóng Cửa Sổ</button>
             </div>
         </div>
     </div>
 
-    <div style="text-align: center; font-size: 11px; color: #777; margin: 20px 0 30px 0; padding: 0 15px; line-height: 1.6;">
+    <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin: 20px 0 30px 0; padding: 0 15px; line-height: 1.6;">
         <b>Tác giả: Nguyễn Việt Khánh - PV01 Tuyên Quang | Version 1.0</b><br>
         Hỗ trợ: 0328.833.388 (Zalo), caicachhanhchinhcatq@gmail.com
     </div>
 
     <div class="nav-tabs" id="bottomNav">
-        <div id="tab-btn-report" class="tab-item" onclick="showPanel('report')">
+        <div id="tab-btn-report" class="tab-item" onclick="triggerHaptic(); showPanel('report')">
             <i class="fa-solid fa-bowl-rice"></i><span>BÁO CƠM</span>
         </div>
-        <div id="tab-btn-history" class="tab-item" onclick="showPanel('history')">
+        <div id="tab-btn-history" class="tab-item" onclick="triggerHaptic(); showPanel('history')">
             <i class="fa-solid fa-chart-column"></i><span>THỐNG KÊ & LỊCH SỬ</span>
         </div>
     </div>
@@ -590,20 +654,25 @@
         const configLockMinute = 15;
         const appLaunchDay = 18; // Ngày khởi chạy phần mềm đầu tiên (18/06/2026)
 
+        // Trạng thái theo dõi chưa lưu
+        let hasUnsavedChanges = false;
+
         // Các biến điều hành dữ liệu và lịch
-        let clientMonthOffset = 0; // 0 = Tháng hiện tại, 1 = Tháng tiếp theo
-        let activeMonth = 6;       // Mặc định tháng 6
-        let activeYear = 2026;     // Mặc định năm 2026
-        let totalDaysInMonth = 30; // Số ngày trong tháng đang làm việc
+        let clientMonthOffset = 0; 
+        let activeMonth = 6;       
+        let activeYear = 2026;     
+        let totalDaysInMonth = 30; 
         
-        let historyMonth = 6;      // Tháng được chọn ở tab Lịch sử
+        let historyMonth = 6;      
         let totalDaysInHistoryMonth = 30;
 
-        let calendarData = []; // Mảng chứa dữ liệu lịch cơm tháng đang chọn của user (1-based index)
-        let historyCalendarData = []; // Mảng lịch sử tra cứu
-        let globalAdminRawRows = []; // Dữ liệu quản lý tổng hợp
+        let calendarData = []; 
+        let historyCalendarData = []; 
+        let globalAdminRawRows = []; 
         
         window.onload = function() {
+            initThemeIcon();
+            
             const realDateObj = new Date();
             const currentRealMonth = realDateObj.getMonth() + 1; 
 
@@ -637,15 +706,59 @@
             initAdminDayDropdown();
         }
 
+        // --- CÁC HÀM SMART & MODERN ---
+        function triggerHaptic() {
+            if (navigator.vibrate) {
+                navigator.vibrate(40); // Điện thoại rung nhẹ 40ms khi chạm
+            }
+        }
+
+        function toggleTheme() {
+            triggerHaptic();
+            const body = document.documentElement;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('app-theme', newTheme);
+            initThemeIcon();
+        }
+
+        function initThemeIcon() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const icon = document.getElementById('theme-icon');
+            if(icon) {
+                icon.className = currentTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            }
+        }
+
+        function markUnsavedChanges() {
+            hasUnsavedChanges = true;
+            const btn = document.getElementById('btn-update-server');
+            if(btn) {
+                btn.classList.add('pulse-alert');
+                btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> CẬP NHẬT (CHƯA LƯU)`;
+            }
+        }
+
+        function clearUnsavedChanges() {
+            hasUnsavedChanges = false;
+            const btn = document.getElementById('btn-update-server');
+            if(btn) {
+                btn.classList.remove('pulse-alert');
+                btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> CẬP NHẬT LÊN HỆ THỐNG TRUNG TÂM`;
+            }
+        }
+        // --- KẾT THÚC CÁC HÀM SMART ---
+
         function customAlert(message, type = "success") {
             const title = type === "error" ? "Cảnh Báo ❌" : "Thông Báo Hệ Thống ✔";
             const titleColor = type === "error" ? "#e53935" : "#2e7d32";
             
             const alertBox = document.createElement('div');
             alertBox.style.cssText = `
-                position: fixed; top: 20px; right: 20px; background: white; padding: 16px 20px;
-                border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-                border-left: 5px solid ${titleColor}; z-index: 11000; max-width: 380px;
+                position: fixed; top: 20px; right: 20px; background: var(--card-bg); padding: 16px 20px;
+                border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); border: 1px solid var(--border-color);
+                border-left: 5px solid ${titleColor}; z-index: 11000; max-width: 380px; color: var(--text-main);
                 display: flex; flex-direction: column; gap: 6px; animation: slideIn 0.3s ease-out;
             `;
             
@@ -654,7 +767,7 @@
                     <i class="${type === 'error' ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-circle-check'}"></i>
                     <span>${title}</span>
                 </div>
-                <div style="font-size: 13px; color: #444; line-height: 1.4;">${message}</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">${message}</div>
             `;
             
             document.body.appendChild(alertBox);
@@ -665,6 +778,7 @@
         }
 
         function showConfirmDialog(message, callback) {
+            triggerHaptic();
             const confirmBox = document.createElement('div');
             confirmBox.id = "custom-confirm-box";
             confirmBox.style.cssText = `
@@ -672,11 +786,11 @@
                 z-index: 12000; display: flex; justify-content: center; align-items: center; padding: 15px;
             `;
             confirmBox.innerHTML = `
-                <div style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 5px solid var(--cand-red);">
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 8px; max-width: 400px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; border-top: 5px solid var(--cand-red);">
                     <div style="font-weight: bold; color: var(--cand-red); font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <i class="fa-solid fa-circle-question"></i><span>Xác Nhận Hành Động</span>
                     </div>
-                    <div style="font-size: 14px; color: #444; line-height: 1.5; margin-bottom: 20px;">${message}</div>
+                    <div style="font-size: 14px; color: var(--text-main); line-height: 1.5; margin-bottom: 20px;">${message}</div>
                     <div style="display: flex; gap: 10px; justify-content: center;">
                         <button id="confirm-yes-btn" class="btn btn-primary" style="padding: 8px 16px; width: auto; font-size: 12px;">Đồng Ý</button>
                         <button id="confirm-no-btn" class="btn btn-clear" style="padding: 8px 16px; width: auto; font-size: 12px; background: #9e9e9e;">Hủy Bỏ</button>
@@ -685,11 +799,12 @@
             `;
             document.body.appendChild(confirmBox);
             
-            document.getElementById('confirm-yes-btn').onclick = function() { callback(); confirmBox.remove(); };
-            document.getElementById('confirm-no-btn').onclick = function() { confirmBox.remove(); };
+            document.getElementById('confirm-yes-btn').onclick = function() { triggerHaptic(); callback(); confirmBox.remove(); };
+            document.getElementById('confirm-no-btn').onclick = function() { triggerHaptic(); confirmBox.remove(); };
         }
 
         function userChangeMonth() {
+            triggerHaptic();
             const selectedMonth = parseInt(document.getElementById('user-month-select').value);
             activeMonth = selectedMonth;
             activeYear = 2026;
@@ -750,10 +865,11 @@
                     countTotalMeals();
                 }
             }
+            clearUnsavedChanges();
         }
 
-        // TÁC VỤ 1: ĐĂNG NHẬP 
         function processQuickLogin() {
+            triggerHaptic();
             let phone = document.getElementById('user-phone-login').value.trim();
             if (!phone) { customAlert('Đồng chí chưa nhập Số điện thoại!', 'error'); return; }
             phone = cleanPhone(phone);
@@ -787,8 +903,8 @@
             .catch(err => { showLoading(false); customAlert("Lỗi kết nối đường truyền: " + err.toString(), "error"); });
         }
 
-        // TÁC VỤ 2: ĐĂNG KÝ MỚI
         function processNewUserRegister() {
+            triggerHaptic();
             let phone = document.getElementById('user-phone-new').value.trim();
             const inputName = document.getElementById('user-name').value.trim();
             const inputUnit = document.getElementById('user-unit').value.trim();
@@ -897,7 +1013,7 @@
                         cell.classList.add('cell-both'); statusSpan.innerHTML = "TRƯA<br>TỐI";
                     } else {
                         cell.classList.add('cell-none'); statusSpan.innerText = "-";
-                        statusSpan.style.color = "#ccc";
+                        statusSpan.style.color = "var(--text-muted)";
                     }
                     cell.onclick = function() { handleDaySelectionChange(d, todayDate, isTodayLocked, isCurrentMonthActive); };
                 }
@@ -906,6 +1022,7 @@
         }
 
         function handleDaySelectionChange(d, todayDate, isTodayLocked, isCurrentMonthActive) {
+            triggerHaptic();
             const realDateObj = new Date();
             if (isCurrentMonthActive) {
                 if (d < todayDate) { customAlert("🔒 Không thể thay đổi lịch báo cơm của những ngày trong quá khứ!", "error"); return; }
@@ -929,12 +1046,13 @@
                 renderStaticHistoryGrid();
                 countTotalMeals();
             }
+            markUnsavedChanges();
         }
 
         function setQuickEatMode(status) {
+            triggerHaptic();
             const now = new Date();
             const currentYear = now.getFullYear();
-            const currentMonthIndex = now.getMonth(); 
             const isCurrentMonthActive = (now.getMonth() + 1 === activeMonth && now.getFullYear() === activeYear);
             const todayDate = isCurrentMonthActive ? now.getDate() : -1;
             const isTodayLocked = isCurrentMonthActive && (now.getHours() * 60 + now.getMinutes() >= (configLockHour * 60 + configLockMinute));
@@ -956,11 +1074,12 @@
                 renderStaticHistoryGrid();
                 countTotalMeals();
             }
+            markUnsavedChanges();
             customAlert("✓ Đã lên lịch báo cơm nhanh cho các ngày trong tuần của tháng (loại trừ Thứ 7 và Chủ nhật).");
         }
 
-        // TÁC VỤ 3: GHI NHẬN LÊN SERVER
         function uploadCalendarToSystem() {
+            triggerHaptic();
             let phone = localStorage.getItem('userPhone');
             if (!phone) { customAlert("Không tìm thấy thông tin phiên làm việc, đồng chí vui lòng đăng nhập lại!", "error"); return; }
             phone = cleanPhone(phone);
@@ -986,6 +1105,7 @@
                 showLoading(false);
                 if (response && response.status === "success") {
                     localStorage.setItem(`userCalendar_${activeMonth}_${activeYear}`, JSON.stringify(calendarData));
+                    clearUnsavedChanges();
                     customAlert("✓ Hệ thống đã ghi nhận! Đồng bộ và lưu dữ liệu lịch cơm tháng này thành công");
                     renderCalendarView();
                 } else {
@@ -996,6 +1116,7 @@
         }
 
         function fetchMonthHistoryFromServer() {
+            triggerHaptic();
             const selectedMonth = parseInt(document.getElementById('history-month-select').value);
             let phone = localStorage.getItem('userPhone');
             phone = cleanPhone(phone);
@@ -1175,9 +1296,10 @@
             document.getElementById('total-money').innerText = moneyTotal.toLocaleString('vi-VN') + " đ";
         }
 
-        function showAdminLoginForm() { hideAllPanels(); document.getElementById('panel-admin-login').classList.add('active'); }
+        function showAdminLoginForm() { triggerHaptic(); hideAllPanels(); document.getElementById('panel-admin-login').classList.add('active'); }
 
         function verifyAdminLogin() {
+            triggerHaptic();
             const user = document.getElementById('admin-username').value.trim();
             const pass = document.getElementById('admin-password').value.trim();
             if (!user || !pass) { customAlert("Đồng chí vui lòng điền đầy đủ tài khoản mật khẩu!", "error"); return; }
@@ -1207,6 +1329,7 @@
         }
 
         function processAdminChangeCreds() {
+            triggerHaptic();
             const newUsername = document.getElementById('admin-new-username').value.trim();
             const newPassword = document.getElementById('admin-new-password').value.trim();
             if (!newUsername || !newPassword) { customAlert("Đồng chí vui lòng nhập đầy đủ Tên đăng nhập mới và Mật khẩu mới!", "error"); return; }
@@ -1231,6 +1354,7 @@
         }
 
         function fetchFullDatabaseFromSystem() {
+            triggerHaptic();
             showLoading(true);
             const adminMonth = document.getElementById('admin-month-select').value;
             
@@ -1270,7 +1394,7 @@
             
             if (!isCurrentMonthActive) {
                 container.innerHTML = `
-                    <div class="admin-stat-card" style="grid-column: span 3; text-align: center; color: #666; font-style: italic; padding: 15px;">
+                    <div class="admin-stat-card" style="grid-column: span 3; text-align: center; color: var(--text-muted); font-style: italic; padding: 15px;">
                         <i class="fa-solid fa-circle-info"></i> Thống kê nhanh quân số chỉ khả dụng khi đang kiểm tra Tháng hiện tại (Tháng ${realDateObj.getMonth() + 1}).
                     </div>`;
                 return;
@@ -1313,14 +1437,14 @@
 
                 let totalSuat = lunchCount + dinnerCount;
                 let totalCost = totalSuat * price;
-                let costInfo = (t.key !== 'tomorrow') ? `<div style="font-size: 11px; color: #555; margin-bottom: 8px;"><b>Thành tiền:</b> ${totalCost.toLocaleString('vi-VN')} đ</div>` : '<div style="font-size: 11px; color: #555; margin-bottom: 8px;"><b>Dự kiến ngày mai</b></div>';
+                let costInfo = (t.key !== 'tomorrow') ? `<div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;"><b>Thành tiền:</b> ${totalCost.toLocaleString('vi-VN')} đ</div>` : '<div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;"><b>Dự kiến ngày mai</b></div>';
 
                 container.innerHTML += `
                     <div class="admin-stat-card ${t.class}">
                         <div>
                             <div class="admin-stat-title">${t.label}</div>
                             <div class="admin-stat-val" style="margin-bottom: 2px;">${totalSuat} suất</div>
-                            <div style="font-size: 11px; color: #333; margin-bottom: 6px; font-weight: 500;">
+                            <div style="font-size: 11px; color: var(--text-main); margin-bottom: 6px; font-weight: 500;">
                                 Trưa: <span style="color: var(--status-lunch);">${lunchCount}</span> suất | Tối: <span style="color: var(--status-dinner);">${dinnerCount}</span> suất
                             </div>
                             ${costInfo}
@@ -1333,6 +1457,7 @@
         }
 
         function showDetailedPeopleModal(targetKey, label, dayNum) {
+            triggerHaptic();
             const titleSpan = document.getElementById('admin-people-modal-title');
             const bodyDiv = document.getElementById('admin-people-modal-body');
             
@@ -1342,7 +1467,7 @@
             
             globalAdminRawRows.forEach(user => {
                 let st = user.calendar[dayNum - 1] || "NONE";
-                let userInfo = `<b>${user.name}</b> <span style="color:#777; font-size:11px;">(${user.unit})</span>`;
+                let userInfo = `<b>${user.name}</b> <span style="color:var(--text-muted); font-size:11px;">(${user.unit})</span>`;
                 if (st === "LUNCH") lunchList.push(userInfo);
                 else if (st === "DINNER") dinnerList.push(userInfo);
                 else if (st === "BOTH") bothList.push(userInfo);
@@ -1350,20 +1475,20 @@
             
             let htmlContent = '';
             
-            htmlContent += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            htmlContent += `<div style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
                 <div style="font-weight: bold; color: var(--cand-red); font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-bell"></i> ĂN CẢ HAI BỮA TRƯA + TỐI (${bothList.length} đồng chí)
                 </div>`;
             if (bothList.length > 0) htmlContent += `<ol style="margin-left: 20px; line-height: 1.6;">${bothList.map(item => `<li>${item}</li>`).join('')}</ol>`;
-            else htmlContent += `<p style="color:#888; font-style:italic; margin-left: 10px;">Không có ai đăng ký</p>`;
+            else htmlContent += `<p style="color:var(--text-muted); font-style:italic; margin-left: 10px;">Không có ai đăng ký</p>`;
             htmlContent += `</div>`;
             
-            htmlContent += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            htmlContent += `<div style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
                 <div style="font-weight: bold; color: var(--status-lunch); font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-bowl-food"></i> CHỈ ĐĂNG KÝ ĂN TRƯA (${lunchList.length} đồng chí)
                 </div>`;
             if (lunchList.length > 0) htmlContent += `<ol style="margin-left: 20px; line-height: 1.6;">${lunchList.map(item => `<li>${item}</li>`).join('')}</ol>`;
-            else htmlContent += `<p style="color:#888; font-style:italic; margin-left: 10px;">Không có ai đăng ký</p>`;
+            else htmlContent += `<p style="color:var(--text-muted); font-style:italic; margin-left: 10px;">Không có ai đăng ký</p>`;
             htmlContent += `</div>`;
             
             htmlContent += `<div style="margin-bottom: 5px;">
@@ -1371,14 +1496,14 @@
                     <i class="fa-solid fa-moon"></i> CHỈ ĐĂNG KÝ ĂN TỐI (${dinnerList.length} đồng chí)
                 </div>`;
             if (dinnerList.length > 0) htmlContent += `<ol style="margin-left: 20px; line-height: 1.6;">${dinnerList.map(item => `<li>${item}</li>`).join('')}</ol>`;
-            else htmlContent += `<p style="color:#888; font-style:italic; margin-left: 10px;">Không có ai đăng ký</p>`;
+            else htmlContent += `<p style="color:var(--text-muted); font-style:italic; margin-left: 10px;">Không có ai đăng ký</p>`;
             htmlContent += `</div>`;
             
             bodyDiv.innerHTML = htmlContent;
             document.getElementById('admin-people-modal').style.display = 'flex';
         }
 
-        function closeAdminPeopleModal() { document.getElementById('admin-people-modal').style.display = 'none'; }
+        function closeAdminPeopleModal() { triggerHaptic(); document.getElementById('admin-people-modal').style.display = 'none'; }
 
         function renderAdminMatrix() {
             const filterRange = document.getElementById('filter-range').value;
@@ -1413,7 +1538,7 @@
                 let isTodayColumn = isCurrentMonthActive && (d === todayD);
                 let isPastColumn = isCurrentMonthActive && (d < todayD);
                 let style = isTodayColumn ? 'background-color:var(--cand-gold);color:#000;font-weight:bold;' : '';
-                if (isPastColumn) style += 'background-color:#eceff1;';
+                if (isPastColumn) style += 'background-color:var(--past-bg);';
                 headTr.innerHTML += `<th style="${style}">N.${d}</th>`;
             }
             headTr.innerHTML += `<th>Suất Ăn Thực</th><th>Thành Tiền Đã Ăn</th>`;
@@ -1421,7 +1546,7 @@
 
             globalAdminRawRows.forEach(user => {
                 let tr = document.createElement('tr');
-                tr.innerHTML = `<td class="td-sticky"><b>${user.name}</b></td><td><span style="font-size:10px; color:#666;">${user.unit}</span></td>`;
+                tr.innerHTML = `<td class="td-sticky"><b>${user.name}</b></td><td><span style="font-size:10px; color:var(--text-muted);">${user.unit}</span></td>`;
                 
                 let userMealsCountReal = 0; 
                 for (let d = startDay; d <= endDay; d++) {
@@ -1433,7 +1558,7 @@
                     if (adminMonth === 6 && d < appLaunchDay) isPastDay = false; 
 
                     let cellStyle = "";
-                    if (isCurrentMonthActive && d === todayD) cellStyle = "border: 1.5px solid #000;";
+                    if (isCurrentMonthActive && d === todayD) cellStyle = "border: 1.5px solid var(--text-main);";
 
                     if (st === "LUNCH") { 
                         if (isPastDay) userMealsCountReal += 1; 
@@ -1452,7 +1577,7 @@
                     }
                 }
                 let userMoneyReal = userMealsCountReal * price;
-                tr.innerHTML += `<td style="font-weight:bold; color:green;">${userMealsCountReal}</td><td style="font-weight:bold; color:red;">${userMoneyReal.toLocaleString('vi-VN')}</td>`;
+                tr.innerHTML += `<td style="font-weight:bold; color:var(--success);">${userMealsCountReal}</td><td style="font-weight:bold; color:var(--cand-red);">${userMoneyReal.toLocaleString('vi-VN')}</td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -1471,6 +1596,7 @@
         }
 
         function processAdminManualUpdate() {
+            triggerHaptic();
             const phone = document.getElementById('admin-add-phone').value.trim();
             const day = document.getElementById('admin-add-day').value;
             const status = document.getElementById('admin-add-status').value;
@@ -1540,12 +1666,12 @@
         }
 
         function exportTableToExcel(tableID, filename = '') {
+            triggerHaptic();
             var table = document.getElementById(tableID);
             var adminMonthSelect = document.getElementById('admin-month-select');
             var adminMonth = adminMonthSelect ? parseInt(adminMonthSelect.value) : activeMonth;
             var exportFilename = filename ? filename + '_Thang_' + adminMonth + '.xls' : 'Thong_Ke_Bep_An.xls';
             
-            // Xây dựng nội dung HTML chuẩn để Excel có thể đọc (bao gồm meta UTF-8 và CSS cơ bản để kẻ bảng)
             var html = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
@@ -1563,7 +1689,6 @@
                 </html>
             `;
 
-            // Dùng Blob và thẻ ẩn để kích hoạt tải file về
             var blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
             var downloadLink = document.createElement("a");
             document.body.appendChild(downloadLink);
@@ -1575,9 +1700,10 @@
             customAlert("Đã xuất file Excel thành công! Vui lòng kiểm tra thư mục tải về.");
         }
 
-        function exitAdminView() { document.getElementById('admin-password').value = ""; checkAuthGate(); }
+        function exitAdminView() { triggerHaptic(); document.getElementById('admin-password').value = ""; checkAuthGate(); }
         
         function showPanel(panelId) {
+            triggerHaptic();
             hideAllPanels();
             document.getElementById(`panel-${panelId}`).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
