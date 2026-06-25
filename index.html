@@ -268,7 +268,7 @@
                         <i class="fa-solid fa-user-plus"></i> ĐỒNG CHÍ ĐĂNG KÝ MỚI LẦN ĐẦU
                     </div>
                     <p style="font-size: 11px; color: #666; margin-bottom: 10px; font-style: italic;">
-                        * Cần điền đầy đủ cả 3 thông tin để khởi tạo hồ sơ tác chiến mới:
+                        * Cần điền đầy đủ cả 3 thông tin để khởi tạo hồ sơ mới:
                     </p>
                     <div class="form-group">
                         <label>Số Điện Thoại:</label>
@@ -339,53 +339,47 @@
                 </select>
             </div>
 
+            <!-- CHÈN THÊM LƯỚI LỊCH BÁO CƠM BỊ THIẾU -->
             <div class="card">
-                <h2 id="calendarTitle">LỊCH ĐĂNG KÝ BÁO CƠM</h2>
-                <div class="calendar-grid" id="calendarGrid"></div>
-                <div class="calendar-note">
-                    <span><span class="note-box" style="background-color: #e3f2fd; border-color: var(--status-lunch);"></span>Trưa</span>
-                    <span><span class="note-box" style="background-color: #f3e5f5; border-color: var(--status-dinner);"></span>Tối</span>
-                    <span><span class="note-box" style="background-color: #ffebee; border-color: var(--status-both);"></span>Cả hai</span>
-                    <span><span class="note-box" style="background-color: #fff;"></span>Cắt cơm</span>
-                    <span><span class="note-box" style="background-color: var(--past-bg);"></span>Quá khứ / Đã khóa</span>
-                </div>
+                <h2 id="calendarTitle">LỊCH ĐĂNG KÝ BÁO CƠM THÁNG</h2>
+                <div id="calendarGrid" class="calendar-grid"></div>
+                <button class="btn btn-primary" style="margin-top: 15px; font-size: 14px; padding: 14px; background-color: var(--cand-red);" onclick="uploadCalendarToSystem()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> CẬP NHẬT LÊN HỆ THỐNG TRUNG TÂM
+                </button>
             </div>
 
-            <button class="btn btn-primary" style="font-size: 15px; padding: 14px;" onclick="uploadCalendarToSystem()">
-                <i class="fa-solid fa-cloud-arrow-up"></i> CẬP NHẬT LÊN HỆ THỐNG TRUNG TÂM
-            </button>
+            <div class="card" style="text-align: center;">
+                <button class="btn btn-outline" style="width: auto; padding: 8px 24px;" onclick="processLogout()">Đăng Xuất Khỏi Thiết Bị</button>
+            </div>
         </div>
 
-        <!-- PANEL THỐNG KÊ LỊCH SỬ -->
+        <!-- BỔ SUNG PANEL LỊCH SỬ VÀ THỐNG KÊ HOÀN CHỈNH BỊ THIẾU -->
         <div id="panel-history" class="view-panel">
+            <div class="month-selector-container">
+                <label style="font-size: 14px; font-weight: bold; color: #1565c0; flex: 1;">Tra cứu tháng:</label>
+                <select id="history-month-select" class="form-control" style="flex: 2; font-weight: bold; border-color: #1565c0;" onchange="fetchMonthHistoryFromServer()">
+                    <option value="6">Tháng 6 / 2026</option>
+                    <option value="7">Tháng 7 / 2026</option>
+                    <option value="8">Tháng 8 / 2026</option>
+                    <option value="9">Tháng 9 / 2026</option>
+                    <option value="10">Tháng 10 / 2026</option>
+                    <option value="11">Tháng 11 / 2026</option>
+                    <option value="12">Tháng 12 / 2026</option>
+                </select>
+            </div>
+
             <div class="card">
-                <h2>Tra Cứu Lịch Sử Theo Tháng</h2>
-                <div class="form-group" style="display: flex; gap: 8px;">
-                    <select id="history-month-select" class="form-control" style="flex: 2;">
-                        <option value="6">Tháng 6 (tháng hiện tại)</option>
-                        <option value="7">Tháng 7</option>
-                        <option value="8">Tháng 8</option>
-                        <option value="9">Tháng 9</option>
-                        <option value="10">Tháng 10</option>
-                        <option value="11">Tháng 11</option>
-                        <option value="12">Tháng 12</option>
-                    </select>
-                    <button class="btn btn-success" style="flex: 1;" onclick="fetchMonthHistoryFromServer()">
-                        <i class="fa-solid fa-magnifying-glass"></i> Tra Cứu
-                    </button>
-                </div>
-                
-                <div class="calendar-grid" id="historyStaticGrid" style="margin-top: 10px;"></div>
-                <div class="calendar-note" style="background: #eef2f7;">
-                    <span><span class="note-box history-cell-eat"></span>Đã ăn (Quá khứ)</span>
-                    <span><span class="note-box history-cell-none"></span>Không ăn (Quá khứ)</span>
-                    <span><span class="note-box history-cell-fut-eat"></span>Đăng ký ăn (Tương lai)</span>
-                    <span><span class="note-box history-cell-fut-none"></span>Cắt cơm (Tương lai)</span>
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Báo Cơm</h2>
+                <div id="historyStaticGrid" class="calendar-grid"></div>
+                <div class="calendar-note" style="margin-top: 15px;">
+                    <div><span class="note-box" style="background-color: #e53935; border-color: #e53935;"></span> Đã ăn</div>
+                    <div><span class="note-box" style="background-color: #4caf50; border-color: #4caf50;"></span> Sẽ ăn</div>
+                    <div><span class="note-box" style="background-color: #9e9e9e; border-color: #dcdcdc;"></span> Cắt cơm</div>
                 </div>
             </div>
 
             <div class="card">
-                <h2>BẢNG THỐNG KÊ TIỀN CƠM</h2>
+                <h2 id="money-stats-title">BẢNG THỐNG KÊ TIỀN CƠM</h2>
                 <div class="form-group">
                     <label>Đơn giá cấu hình/suất ăn (đ):</label>
                     <input type="number" id="meal-price" class="form-control" value="35000" oninput="calculateTotalMoney()">
@@ -417,10 +411,6 @@
                         <b id="total-money" style="color: var(--cand-red); font-size: 18px; text-decoration: underline;">0 đ</b>
                     </div>
                 </div>
-            </div>
-
-            <div class="card" style="text-align: center;">
-                <button class="btn btn-outline" style="width: auto; padding: 8px 24px;" onclick="processLogout()">Đăng Xuất Khỏi Thiết Bị</button>
             </div>
         </div>
 
@@ -605,6 +595,9 @@
         let activeMonth = 6;       // Mặc định tháng 6
         let activeYear = 2026;     // Mặc định năm 2026
         let totalDaysInMonth = 30; // Số ngày trong tháng đang làm việc
+        
+        let historyMonth = 6;      // Tháng được chọn ở tab Lịch sử
+        let totalDaysInHistoryMonth = 30;
 
         let calendarData = []; // Mảng chứa dữ liệu lịch cơm tháng đang chọn của user (1-based index)
         let historyCalendarData = []; // Mảng lịch sử tra cứu
@@ -627,9 +620,18 @@
             }
 
             activeMonth = currentRealMonth;
+            historyMonth = currentRealMonth;
             activeYear = 2026;
             totalDaysInMonth = new Date(activeYear, activeMonth, 0).getDate();
+            totalDaysInHistoryMonth = new Date(activeYear, historyMonth, 0).getDate();
+            
             document.getElementById('calendarTitle').innerText = `LỊCH ĐĂNG KÝ BÁO CƠM THÁNG ${activeMonth}`;
+            
+            const moneyStatsTitle = document.getElementById('money-stats-title');
+            if(moneyStatsTitle) moneyStatsTitle.innerText = `BẢNG THỐNG KÊ TIỀN CƠM THÁNG ${historyMonth}`;
+            
+            const historyMonthSelect = document.getElementById('history-month-select');
+            if (historyMonthSelect) historyMonthSelect.value = currentRealMonth;
 
             checkAuthGate();
             initAdminDayDropdown();
@@ -734,15 +736,19 @@
                 calendarData = JSON.parse(cached);
                 if (calendarData.length !== totalDaysInMonth + 1) calendarData = Array(totalDaysInMonth + 1).fill("NONE");
                 renderCalendarView();
-                historyCalendarData = [...calendarData];
-                renderStaticHistoryGrid();
-                countTotalMeals();
+                if (activeMonth === historyMonth) {
+                    historyCalendarData = [...calendarData];
+                    renderStaticHistoryGrid();
+                    countTotalMeals();
+                }
             } else {
                 calendarData = Array(totalDaysInMonth + 1).fill("NONE");
                 renderCalendarView();
-                historyCalendarData = [...calendarData];
-                renderStaticHistoryGrid();
-                countTotalMeals();
+                if (activeMonth === historyMonth) {
+                    historyCalendarData = [...calendarData];
+                    renderStaticHistoryGrid();
+                    countTotalMeals();
+                }
             }
         }
 
@@ -918,9 +924,11 @@
             calendarData[d] = nextStatus;
             localStorage.setItem(`userCalendar_${activeMonth}_${activeYear}`, JSON.stringify(calendarData));
             renderCalendarView();
-            historyCalendarData = [...calendarData];
-            renderStaticHistoryGrid();
-            countTotalMeals();
+            if (activeMonth === historyMonth) {
+                historyCalendarData = [...calendarData];
+                renderStaticHistoryGrid();
+                countTotalMeals();
+            }
         }
 
         function setQuickEatMode(status) {
@@ -943,9 +951,11 @@
             }
             localStorage.setItem(`userCalendar_${activeMonth}_${activeYear}`, JSON.stringify(calendarData));
             renderCalendarView();
-            historyCalendarData = [...calendarData];
-            renderStaticHistoryGrid();
-            countTotalMeals();
+            if (activeMonth === historyMonth) {
+                historyCalendarData = [...calendarData];
+                renderStaticHistoryGrid();
+                countTotalMeals();
+            }
             customAlert("✓ Đã lên lịch báo cơm nhanh cho các ngày trong tuần của tháng (loại trừ Thứ 7 và Chủ nhật).");
         }
 
@@ -990,9 +1000,14 @@
             let phone = localStorage.getItem('userPhone');
             phone = cleanPhone(phone);
 
+            historyMonth = selectedMonth;
+            totalDaysInHistoryMonth = new Date(activeYear, historyMonth, 0).getDate();
+            const moneyStatsTitle = document.getElementById('money-stats-title');
+            if(moneyStatsTitle) moneyStatsTitle.innerText = `BẢNG THỐNG KÊ TIỀN CƠM THÁNG ${historyMonth}`;
+
             if (selectedMonth < 6) {
                 customAlert("⚠️ Không có dữ liệu trên hệ thống", "error");
-                historyCalendarData = Array(totalDaysInMonth + 1).fill("NONE");
+                historyCalendarData = Array(totalDaysInHistoryMonth + 1).fill("NONE");
                 renderStaticHistoryGrid(); countTotalMeals();
                 return;
             }
@@ -1013,8 +1028,8 @@
             .then(response => {
                 showLoading(false);
                 if (response.status === "success") {
-                    historyCalendarData = Array(totalDaysInMonth + 1).fill("NONE");
-                    for (let d = 1; d <= totalDaysInMonth; d++) {
+                    historyCalendarData = Array(totalDaysInHistoryMonth + 1).fill("NONE");
+                    for (let d = 1; d <= totalDaysInHistoryMonth; d++) {
                         historyCalendarData[d] = response.calendar[d - 1] || "NONE";
                     }
                     renderStaticHistoryGrid(); countTotalMeals(); 
@@ -1024,7 +1039,7 @@
             .catch(err => { 
                 showLoading(false); 
                 customAlert(`⚠️ Không có dữ liệu lưu trữ cho Tháng ${selectedMonth}`, "error");
-                historyCalendarData = Array(totalDaysInMonth + 1).fill("NONE");
+                historyCalendarData = Array(totalDaysInHistoryMonth + 1).fill("NONE");
                 renderStaticHistoryGrid(); countTotalMeals();
             });
         }
@@ -1040,11 +1055,11 @@
             });
 
             const realDateObj = new Date();
-            const isCurrentMonthActive = (realDateObj.getMonth() + 1 === activeMonth && realDateObj.getFullYear() === activeYear);
+            const isCurrentMonthActive = (realDateObj.getMonth() + 1 === historyMonth && realDateObj.getFullYear() === activeYear);
             const todayDate = isCurrentMonthActive ? realDateObj.getDate() : -1;
             const isTodayLocked = isCurrentMonthActive && (realDateObj.getHours() * 60 + realDateObj.getMinutes() >= (configLockHour * 60 + configLockMinute));
 
-            const tempDate = new Date(activeYear, activeMonth - 1, 1);
+            const tempDate = new Date(activeYear, historyMonth - 1, 1);
             let firstDayOfWeek = tempDate.getDay();
             if (firstDayOfWeek === 0) firstDayOfWeek = 7;
 
@@ -1054,7 +1069,7 @@
                 grid.appendChild(blankCell);
             }
 
-            for (let d = 1; d <= totalDaysInMonth; d++) {
+            for (let d = 1; d <= totalDaysInHistoryMonth; d++) {
                 const cell = document.createElement('div');
                 cell.className = 'calendar-cell';
                 
@@ -1072,12 +1087,12 @@
                 if (isCurrentMonthActive) {
                     if (d < todayDate) isPast = true;
                     else if (d === todayDate && isTodayLocked) isPast = true;
-                } else if (activeYear < realDateObj.getFullYear() || (activeYear === realDateObj.getFullYear() && activeMonth < realDateObj.getMonth() + 1)) {
+                } else if (activeYear < realDateObj.getFullYear() || (activeYear === realDateObj.getFullYear() && historyMonth < realDateObj.getMonth() + 1)) {
                     isPast = true;
                 }
 
                 if (isPast) {
-                    if (activeMonth === 6 && d < appLaunchDay) {
+                    if (historyMonth === 6 && d < appLaunchDay) {
                         cell.classList.add('history-cell-none'); statusSpan.innerText = "-";
                     } else {
                         if (st !== "NONE") {
@@ -1107,26 +1122,26 @@
 
         function countTotalMeals() {
             const realDateObj = new Date();
-            const isCurrentMonthActive = (realDateObj.getMonth() + 1 === activeMonth && realDateObj.getFullYear() === activeYear);
+            const isCurrentMonthActive = (realDateObj.getMonth() + 1 === historyMonth && realDateObj.getFullYear() === activeYear);
             const todayDate = isCurrentMonthActive ? realDateObj.getDate() : -1;
             const isTodayLocked = isCurrentMonthActive && (realDateObj.getHours() * 60 + realDateObj.getMinutes() >= (configLockHour * 60 + configLockMinute));
 
             let lunchReal = 0, dinnerReal = 0, totalReal = 0;
             let lunchFut = 0, dinnerFut = 0, totalFut = 0;
 
-            for(let d = 1; d <= totalDaysInMonth; d++) { 
+            for(let d = 1; d <= totalDaysInHistoryMonth; d++) { 
                 let st = historyCalendarData[d] || "NONE"; 
                 
                 let isPast = false;
                 if (isCurrentMonthActive) {
                     if (d < todayDate) isPast = true;
                     else if (d === todayDate && isTodayLocked) isPast = true;
-                } else if (activeYear < realDateObj.getFullYear() || (activeYear === realDateObj.getFullYear() && activeMonth < realDateObj.getMonth() + 1)) {
+                } else if (activeYear < realDateObj.getFullYear() || (activeYear === realDateObj.getFullYear() && historyMonth < realDateObj.getMonth() + 1)) {
                     isPast = true;
                 }
 
                 if (isPast) {
-                    if (activeMonth === 6 && d < appLaunchDay) continue;
+                    if (historyMonth === 6 && d < appLaunchDay) continue;
                     if (st === "LUNCH") { lunchReal++; totalReal++; }
                     else if (st === "DINNER") { dinnerReal++; totalReal++; }
                     else if (st === "BOTH") { lunchReal++; dinnerReal++; totalReal += 2; }
