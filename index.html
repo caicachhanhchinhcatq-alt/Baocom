@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hệ thống Quản lý và Báo cơm Tập thể CAND</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script>
         // Tải giao diện Sáng/Tối ngay lập tức để tránh nháy màn hình
         const savedTheme = localStorage.getItem('app-theme') || 'light';
@@ -14,22 +15,22 @@
 
     <style>
         :root {
-            --cand-red: #b71c1c;      
-            --cand-red-light: #e53935;
-            --cand-gold: #fbc02d;     
-            --cand-gold-dark: #f57f17;
+            --cand-red: #166534;
+            --cand-red-light: #22c55e;
+            --cand-gold: #fbbf24;
+            --cand-gold-dark: #d97706;
             --success: #2e7d32;
-            
-            --status-lunch: #1565c0;   
-            --status-dinner: #6a1b9a;  
-            --status-both: #e53935;    
-            
+
+            --status-lunch: #0ea5e9;
+            --status-dinner: #8b5cf6;
+            --status-both: #ef4444;
+
             /* Giao diện sáng mặc định */
             --bg-color: #f4f6f9;
             --text-main: #212121;
             --text-muted: #666666;
-            --card-bg: #ffffff;
-            --card-alt-bg: #fafafa;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-alt-bg: rgba(250, 250, 250, 0.92);
             --border-color: #e0e0e0;
             --input-border: #bcbcbc;
             --input-bg: #ffffff;
@@ -47,8 +48,8 @@
             --bg-color: #121212;
             --text-main: #e0e0e0;
             --text-muted: #aaaaaa;
-            --card-bg: #1e1e1e;
-            --card-alt-bg: #2a2a2a;
+            --card-bg: rgba(31, 41, 55, 0.92);
+            --card-alt-bg: rgba(42, 42, 42, 0.92);
             --border-color: #333333;
             --input-border: #555555;
             --input-bg: #2d2d2d;
@@ -61,26 +62,51 @@
             --status-none: #1e1e1e;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
-        
-        body { 
+        * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+
+        body {
             background-color: var(--bg-color);
             color: var(--text-main);
             padding-bottom: 80px;
             -webkit-tap-highlight-color: transparent;
             transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        header { 
-            background: linear-gradient(135deg, var(--cand-red), #7f0000); 
-            color: white; 
-            padding: 18px 15px; 
-            text-align: center; 
-            border-bottom: 4px solid var(--cand-gold);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            min-height: 100vh;
             position: relative;
         }
-        header h1 { font-size: 20px; font-weight: bold; letter-spacing: 0.5px; text-shadow: 1px 1px 2px #000; }
+
+        /* Ảnh nền mờ */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+            filter: blur(3px) brightness(0.6);
+        }
+        [data-theme="dark"] body::before { filter: blur(3px) brightness(0.3); }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: rgba(22, 101, 52, 0.3);
+        }
+        [data-theme="dark"] body::after { background: rgba(0,0,0,0.5); }
+
+        header {
+            background: linear-gradient(135deg, rgba(22, 101, 52, 0.95), rgba(17, 24, 39, 0.95));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            padding: 18px 15px;
+            text-align: center;
+            border-bottom: 3px solid var(--cand-gold);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        header h1 { font-size: 18px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; text-shadow: 1px 1px 2px #000; }
         header p { margin-top: 6px; font-size: 13px; color: var(--cand-gold); font-weight: 500; min-height: 18px; }
 
         .theme-toggle-btn {
@@ -88,8 +114,8 @@
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid var(--cand-gold);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: var(--cand-gold);
             width: 36px;
             height: 36px;
@@ -103,22 +129,25 @@
         }
         .theme-toggle-btn:active { transform: translateY(-50%) scale(0.9); }
 
-        .container { max-width: 850px; margin: 12px auto; padding: 0 12px; }
-        
-        .card { 
-            background: var(--card-bg); 
-            padding: 18px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            margin-bottom: 15px; 
-            border: 1px solid var(--border-color);
+        .container { max-width: 850px; margin: 20px auto; padding: 0 12px; }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 18px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.4);
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        .card h2 { 
-            font-size: 15px; 
-            color: var(--cand-red); 
-            border-left: 4px solid var(--cand-gold); 
-            padding-left: 8px; 
+        [data-theme="dark"] .card { border: 1px solid rgba(255,255,255,0.08); }
+        .card h2 {
+            font-size: 15px;
+            color: var(--cand-red);
+            border-left: 4px solid var(--cand-gold);
+            padding-left: 8px;
             margin-bottom: 15px;
             font-weight: bold;
             text-transform: uppercase;
@@ -126,12 +155,13 @@
             align-items: center;
             gap: 6px;
         }
+        [data-theme="dark"] .card h2 { color: #4ade80; }
 
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 13px; color: var(--text-main); transition: color 0.3s ease; }
-        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--input-border); border-radius: 4px; font-size: 14px; background-color: var(--input-bg); color: var(--text-main); transition: all 0.3s ease; }
-        .form-control:focus { border-color: var(--cand-red); outline: none; }
-        
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--input-border); border-radius: 8px; font-size: 14px; background-color: var(--input-bg); color: var(--text-main); transition: all 0.3s ease; }
+        .form-control:focus { border-color: var(--cand-red); outline: none; box-shadow: 0 0 0 3px rgba(22,101,52,0.15); }
+
         .btn-grid-quick {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -142,81 +172,83 @@
             .btn-grid-quick { grid-template-columns: 1fr; }
         }
 
-        .btn { display: inline-block; width: 100%; padding: 12px; border: none; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; transition: background 0.2s, transform 0.1s; user-select: none; }
-        .btn:active { transform: scale(0.98); }
+        .btn { display: inline-block; width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; transition: background 0.2s, transform 0.1s; user-select: none; }
+        .btn:active { transform: scale(0.97); }
         .btn-primary { background-color: var(--cand-red); color: white; }
-        .btn-primary:hover { background-color: #7f0000; }
+        .btn-primary:hover { background-color: #14532d; }
         .btn-success { background-color: var(--success); color: white; }
         .btn-success:hover { background-color: #1b5e20; }
         .btn-gold { background-color: var(--cand-gold); color: #212121; }
         .btn-gold:hover { background-color: var(--cand-gold-dark); }
         .btn-outline { background-color: var(--card-bg); border: 1px solid var(--cand-red); color: var(--cand-red); }
-        .btn-outline:hover { background-color: #ffebee; }
+        .btn-outline:hover { background-color: rgba(22,101,52,0.08); }
         .btn-clear { background-color: #757575; color: white; }
         .btn-clear:hover { background-color: #616161; }
 
-        .nav-tabs { display: none; justify-content: space-around; background: var(--card-bg); position: fixed; bottom: 0; left: 0; right: 0; border-top: 3px solid var(--cand-gold); box-shadow: 0 -3px 10px rgba(0,0,0,0.1); z-index: 999; transition: background-color 0.3s ease; }
+        .nav-tabs { display: none; justify-content: space-around; background: var(--card-bg); backdrop-filter: blur(10px); position: fixed; bottom: 0; left: 0; right: 0; border-top: 3px solid var(--cand-gold); box-shadow: 0 -3px 10px rgba(0,0,0,0.1); z-index: 999; transition: background-color 0.3s ease; }
         .tab-item { padding: 14px 5px; text-align: center; flex: 1; cursor: pointer; font-size: 12px; font-weight: bold; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.3s ease; }
         .tab-item i { font-size: 16px; }
-        .tab-item.active { color: var(--cand-red); background-color: rgba(183, 28, 28, 0.1); }
+        .tab-item.active { color: var(--cand-red); background-color: rgba(22, 101, 52, 0.1); }
+        [data-theme="dark"] .tab-item.active { color: #4ade80; }
 
         .view-panel { display: none; animation: fadeUp 0.3s ease-out; }
         .view-panel.active { display: block; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
-        .calendar-day-head { font-weight: bold; font-size: 12px; padding: 8px 0; color: white; background-color: var(--cand-red); border-radius: 3px; }
-        
-        .calendar-cell { padding: 4px 2px; font-size: 13px; font-weight: bold; border-radius: 4px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; user-select: none; min-height: 48px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transition: all 0.2s ease; overflow: hidden; }
+        .calendar-day-head { font-weight: bold; font-size: 12px; padding: 8px 0; color: white; background-color: var(--cand-red); border-radius: 6px; }
+
+        .calendar-cell { padding: 4px 2px; font-size: 13px; font-weight: bold; border-radius: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; user-select: none; min-height: 48px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transition: all 0.2s ease; overflow: hidden; }
         .calendar-cell:active { transform: scale(0.92); }
         .calendar-cell .day-num { margin-bottom: 2px; }
-        .calendar-cell .day-status { font-size: 9px; padding: 2px 0; border-radius: 2px; color: white; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: normal; line-height: 1.1; font-weight: bold; box-sizing: border-box; }
-        
+        .calendar-cell .day-status { font-size: 9px; padding: 2px 0; border-radius: 4px; color: white; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: normal; line-height: 1.1; font-weight: bold; box-sizing: border-box; }
+
         .cell-none { background-color: var(--status-none); }
-        .cell-lunch { background-color: rgba(21, 101, 192, 0.15); color: var(--status-lunch); border-color: var(--status-lunch); }
+        .cell-lunch { background-color: rgba(14, 165, 233, 0.15); color: var(--status-lunch); border-color: var(--status-lunch); }
         .cell-lunch .day-status { background-color: var(--status-lunch); color: white; }
-        .cell-dinner { background-color: rgba(106, 27, 154, 0.15); color: var(--status-dinner); border-color: var(--status-dinner); }
+        .cell-dinner { background-color: rgba(139, 92, 246, 0.15); color: var(--status-dinner); border-color: var(--status-dinner); }
         .cell-dinner .day-status { background-color: var(--status-dinner); color: white; }
-        .cell-both { background-color: rgba(229, 57, 53, 0.15); color: var(--status-both); border-color: var(--status-both); }
+        .cell-both { background-color: rgba(239, 68, 68, 0.15); color: var(--status-both); border-color: var(--status-both); }
         .cell-both .day-status { background-color: var(--status-both); color: white; }
-        
+
         .calendar-cell.past-day { background-color: var(--past-bg) !important; color: var(--text-muted) !important; border-color: var(--border-color); cursor: not-allowed; }
         .calendar-cell.past-day:active { transform: none; }
         .calendar-cell.past-day .day-status { background-color: #9e9e9e !important; color: #fff !important; }
-        .calendar-cell.today { border: 2px solid var(--text-main); box-shadow: inset 0 0 4px rgba(0,0,0,0.2); }
+        .calendar-cell.today { border: 2px solid var(--cand-gold); box-shadow: inset 0 0 4px rgba(0,0,0,0.2); }
         .calendar-cell.today-locked { background-color: var(--past-bg) !important; color: var(--text-muted); border: 2px dashed var(--text-muted); cursor: not-allowed; }
         .calendar-cell.today-locked .day-status { background-color: #888 !important; }
-        
-        .history-cell-eat { background-color: rgba(229, 57, 53, 0.15) !important; color: var(--cand-red) !important; border-color: var(--cand-red-light) !important; }
+
+        .history-cell-eat { background-color: rgba(34, 197, 94, 0.15) !important; color: var(--cand-red) !important; border-color: var(--cand-red-light) !important; }
+        [data-theme="dark"] .history-cell-eat { color: #4ade80 !important; }
         .history-cell-eat .day-status { background-color: var(--cand-red-light) !important; color: white !important; }
         .history-cell-none { background-color: var(--past-bg) !important; color: var(--text-muted) !important; border-color: var(--border-color) !important; }
         .history-cell-none .day-status { background-color: #9e9e9e !important; color: white !important; }
-        
+
         .history-cell-fut-eat { background-color: var(--future-eat) !important; color: var(--success) !important; border-color: #4caf50 !important; border-style: dashed !important; }
         .history-cell-fut-eat .day-status { background-color: #4caf50 !important; color: white !important; }
         .history-cell-fut-none { background-color: var(--future-none) !important; color: var(--text-muted) !important; border-color: var(--border-color) !important; border-style: dashed !important; }
         .history-cell-fut-none .day-status { background-color: #bdbdbd !important; color: white !important; }
 
-        .calendar-note { display: flex; gap: 8px; justify-content: center; font-size: 11px; margin-top: 10px; flex-wrap: wrap; background: var(--note-bg); padding: 8px; border-radius: 5px; transition: background-color 0.3s ease; }
-        .note-box { width: 12px; height: 12px; border-radius: 2px; display: inline-block; vertical-align: middle; margin-right: 3px; border: 1px solid var(--border-color); }
+        .calendar-note { display: flex; gap: 8px; justify-content: center; font-size: 11px; margin-top: 10px; flex-wrap: wrap; background: var(--note-bg); padding: 8px; border-radius: 8px; transition: background-color 0.3s ease; }
+        .note-box { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 3px; border: 1px solid var(--border-color); }
 
-        .alert-info { background-color: var(--alert-bg); color: var(--text-main); padding: 12px; border-radius: 4px; font-size: 13px; margin-bottom: 12px; border-left: 4px solid #1e88e5; line-height: 1.5; transition: background-color 0.3s ease, color 0.3s ease; }
-        .alert-loading { background-color: var(--cand-gold); color: #000; padding: 10px; border-radius: 4px; font-size: 13px; text-align: center; font-weight: bold; margin-bottom: 12px; display: none; }
-        
-        .table-responsive { width: 100%; overflow-x: auto; border: 1px solid var(--border-color); margin-top: 8px; border-radius: 4px; transition: border-color 0.3s ease; }
+        .alert-info { background-color: var(--alert-bg); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; border-left: 4px solid var(--status-lunch); line-height: 1.5; transition: background-color 0.3s ease, color 0.3s ease; }
+        .alert-loading { background-color: var(--cand-gold); color: #000; padding: 10px; border-radius: 8px; font-size: 13px; text-align: center; font-weight: bold; margin-bottom: 12px; display: none; }
+
+        .table-responsive { width: 100%; overflow-x: auto; border: 1px solid var(--border-color); margin-top: 8px; border-radius: 8px; transition: border-color 0.3s ease; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; background-color: var(--card-bg); transition: background-color 0.3s ease; }
         table th, table td { border: 1px solid var(--border-color); padding: 6px 8px; text-align: center; white-space: nowrap; transition: border-color 0.3s ease; }
         table th { background-color: var(--table-header-bg); color: var(--text-main); font-weight: bold; transition: background-color 0.3s ease, color 0.3s ease; }
         .th-sticky { position: sticky; left: 0; background-color: var(--table-header-bg); font-weight: bold; z-index: 2; }
         .td-sticky { position: sticky; left: 0; background-color: var(--card-bg); color: var(--text-main); font-weight: bold; z-index: 1; text-align: left; }
-        
-        .matrix-lunch { background-color: rgba(21, 101, 192, 0.15); color: var(--status-lunch); font-weight: bold; }
-        .matrix-dinner { background-color: rgba(106, 27, 154, 0.15); color: var(--status-dinner); font-weight: bold; }
-        .matrix-both { background-color: rgba(229, 57, 53, 0.15); color: var(--status-both); font-weight: bold; }
+
+        .matrix-lunch { background-color: rgba(14, 165, 233, 0.15); color: var(--status-lunch); font-weight: bold; }
+        .matrix-dinner { background-color: rgba(139, 92, 246, 0.15); color: var(--status-dinner); font-weight: bold; }
+        .matrix-both { background-color: rgba(239, 68, 68, 0.15); color: var(--status-both); font-weight: bold; }
 
         .login-sub-card {
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 12px;
             padding: 12px;
             background: var(--card-alt-bg);
             margin-bottom: 15px;
@@ -233,6 +265,7 @@
             align-items: center;
             gap: 6px;
         }
+        [data-theme="dark"] .login-sub-title { color: #4ade80; }
 
         .month-selector-container {
             display: flex;
@@ -253,7 +286,7 @@
         }
         .admin-stat-card {
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 12px;
             padding: 12px;
             text-align: left;
             background: var(--card-bg);
@@ -271,12 +304,12 @@
 
         /* Animation nhắc nhở lưu thông minh */
         .pulse-alert {
-            animation: pulseRed 1.5s infinite;
+            animation: pulseGreen 1.5s infinite;
         }
-        @keyframes pulseRed {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(183, 28, 28, 0.7); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(183, 28, 28, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(183, 28, 28, 0); }
+        @keyframes pulseGreen {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(22, 101, 52, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(22, 101, 52, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(22, 101, 52, 0); }
         }
 
         @keyframes slideIn {
@@ -287,6 +320,11 @@
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(120%); opacity: 0; }
         }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #475569; }
     </style>
 </head>
 <body>
@@ -326,18 +364,26 @@
                         <i class="fa-solid fa-user-plus"></i> ĐỒNG CHÍ ĐĂNG KÝ MỚI LẦN ĐẦU
                     </div>
                     <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
-                        * Cần điền đầy đủ cả 3 thông tin để khởi tạo hồ sơ mới:
+                        * Cần điền đầy đủ 5 thông tin (bắt buộc) để khởi tạo hồ sơ mới. Mỗi số điện thoại chỉ được đăng ký cho DUY NHẤT một cán bộ:
                     </p>
                     <div class="form-group">
-                        <label>Số Điện Thoại:</label>
+                        <label>Số Điện Thoại: <span style="color:var(--status-both)">*</span></label>
                         <input type="tel" id="user-phone-new" class="form-control" placeholder="Ví dụ: 0987654321">
                     </div>
                     <div class="form-group">
-                        <label>Họ và Tên Cán Bộ:</label>
-                        <input type="text" id="user-name" class="form-control" placeholder="Ví dụ: Nguyễn Văn A">
+                        <label>Họ: <span style="color:var(--status-both)">*</span></label>
+                        <input type="text" id="user-ho" class="form-control" placeholder="Ví dụ: Nguyễn">
                     </div>
                     <div class="form-group">
-                        <label>Đội / Phòng công tác:</label>
+                        <label>Tên đệm: <span style="color:var(--status-both)">*</span></label>
+                        <input type="text" id="user-tendem" class="form-control" placeholder="Ví dụ: Văn">
+                    </div>
+                    <div class="form-group">
+                        <label>Tên: <span style="color:var(--status-both)">*</span></label>
+                        <input type="text" id="user-ten" class="form-control" placeholder="Ví dụ: A">
+                    </div>
+                    <div class="form-group">
+                        <label>Đội / Phòng công tác: <span style="color:var(--status-both)">*</span></label>
                         <input type="text" id="user-unit" class="form-control" placeholder="Ví dụ: Đội Tổng hợp - PX01">
                     </div>
                     <button class="btn btn-primary" onclick="processNewUserRegister()">Đăng Ký & Đăng Nhập</button>
@@ -906,14 +952,17 @@
         function processNewUserRegister() {
             triggerHaptic();
             let phone = document.getElementById('user-phone-new').value.trim();
-            const inputName = document.getElementById('user-name').value.trim();
+            const inputHo = document.getElementById('user-ho').value.trim();
+            const inputTenDem = document.getElementById('user-tendem').value.trim();
+            const inputTen = document.getElementById('user-ten').value.trim();
             const inputUnit = document.getElementById('user-unit').value.trim();
-            
-            if (!phone || !inputName || !inputUnit) { 
-                customAlert('Đồng chí cần điền đầy đủ cả 3 thông tin để đăng ký hồ sơ mới!', 'error'); 
-                return; 
+
+            if (!phone || !inputHo || !inputTenDem || !inputTen || !inputUnit) {
+                customAlert('Đồng chí cần điền đầy đủ cả 5 thông tin (Số điện thoại, Họ, Tên đệm, Tên, Đơn vị) để đăng ký hồ sơ mới!', 'error');
+                return;
             }
             phone = cleanPhone(phone);
+            const inputName = `${inputHo} ${inputTenDem} ${inputTen}`.replace(/\s+/g, ' ').trim();
             showLoading(true);
 
             fetch(WEB_APP_URL, {
@@ -938,6 +987,8 @@
                     localStorage.setItem(`userCalendar_${activeMonth}_${activeYear}`, JSON.stringify(calendarData));
                     customAlert("✓ Khởi tạo hồ sơ cán bộ mới trên hệ thống trung tâm thành công!");
                     checkAuthGate();
+                } else if (res.status === "duplicate_phone") {
+                    customAlert(`Đã có tài khoản sử dụng số điện thoại này rồi (tên đã đăng ký: ${res.existingName}). Vui lòng dùng mục "Đã có tài khoản" để đăng nhập, hoặc liên hệ Bếp trưởng nếu cần điều chỉnh.`, "error");
                 } else {
                     customAlert("Lỗi máy chủ: " + res.error, "error");
                 }
