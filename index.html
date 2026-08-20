@@ -227,16 +227,30 @@
         .calendar-cell.today-locked { background-color: var(--past-bg) !important; color: var(--text-muted); border: 2px dashed var(--text-muted); cursor: not-allowed; }
         .calendar-cell.today-locked .day-status { background-color: #888 !important; }
 
-        .history-cell-eat { background-color: rgba(34, 197, 94, 0.15) !important; color: var(--cand-red) !important; border-color: var(--cand-red-light) !important; }
+        .history-cell-eat { background-color: rgba(34, 197, 94, 0.15) !important; color: var(--cand-red) !important; border: 2px solid var(--cand-red-light) !important; border-style: solid !important; }
         [data-theme="dark"] .history-cell-eat { color: #4ade80 !important; }
         .history-cell-eat .day-status { background-color: var(--cand-red-light) !important; color: white !important; }
         .history-cell-none { background-color: var(--past-bg) !important; color: var(--text-muted) !important; border-color: var(--border-color) !important; }
         .history-cell-none .day-status { background-color: #9e9e9e !important; color: white !important; }
 
-        .history-cell-fut-eat { background-color: var(--future-eat) !important; color: var(--success) !important; border-color: #4caf50 !important; border-style: dashed !important; }
+        .history-cell-fut-eat { background-color: var(--future-eat) !important; color: var(--success) !important; border: 2px dashed #4caf50 !important; border-style: dashed !important; }
         .history-cell-fut-eat .day-status { background-color: #4caf50 !important; color: white !important; }
         .history-cell-fut-none { background-color: var(--future-none) !important; color: var(--text-muted) !important; border-color: var(--border-color) !important; border-style: dashed !important; }
         .history-cell-fut-none .day-status { background-color: #bdbdbd !important; color: white !important; }
+
+        /* Đánh dấu ô "hôm nay" trong lưới Lịch Sử Báo Cơm, không phụ thuộc trạng thái ăn/nghỉ của ngày đó */
+        .history-cell-today { position: relative; outline: 3px solid var(--cand-gold); outline-offset: -3px; z-index: 2; }
+        .history-cell-today::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cand-gold);
+            box-shadow: 0 0 0 2px var(--card-bg);
+        }
 
         .calendar-note { display: flex; gap: 8px; justify-content: center; font-size: 11px; margin-top: 10px; flex-wrap: wrap; background: var(--note-bg); padding: 8px; border-radius: 8px; transition: background-color 0.3s ease; }
         .note-box { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 3px; border: 1px solid var(--border-color); }
@@ -310,6 +324,66 @@
         .matrix-lunch { background-color: rgba(14, 165, 233, 0.15); color: var(--status-lunch); font-weight: bold; }
         .matrix-dinner { background-color: rgba(139, 92, 246, 0.15); color: var(--status-dinner); font-weight: bold; }
         .matrix-both { background-color: rgba(239, 68, 68, 0.15); color: var(--status-both); font-weight: bold; }
+
+        /* Thanh tab điều hướng admin giờ dùng chung style .nav-tabs / .tab-item (cố định dưới cùng màn hình) */
+        #adminBottomNav .tab-item.active { color: var(--cand-red); background-color: rgba(22, 101, 52, 0.1); }
+        [data-theme="dark"] #adminBottomNav .tab-item.active { color: #4ade80; }
+
+        .admin-subtab-panel { display: none; padding-bottom: 15px; }
+        .admin-subtab-panel.active { display: block; animation: fadeInPanel 0.25s ease; }
+        @keyframes fadeInPanel {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .unit-suggest-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 500;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        }
+        .unit-suggest-item {
+            padding: 9px 12px;
+            font-size: 13px;
+            color: var(--text-main);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .unit-suggest-item:last-child { border-bottom: none; }
+        .unit-suggest-item:hover, .unit-suggest-item.active-suggest {
+            background: var(--future-eat);
+        }
+        .unit-suggest-empty {
+            padding: 9px 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .admin-unit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .admin-unit-row:last-child { border-bottom: none; }
+        .admin-unit-row .del-unit-btn {
+            background: none;
+            border: none;
+            color: var(--status-both);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+        }
 
         .login-sub-card {
             border: 1px solid var(--border-color);
@@ -453,9 +527,10 @@
                         <label>Tên: <span style="color:var(--status-both)">*</span></label>
                         <input type="text" id="user-ten" class="form-control" placeholder="Ví dụ: A">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="position: relative;">
                         <label>Đội / Phòng công tác: <span style="color:var(--status-both)">*</span></label>
-                        <input type="text" id="user-unit" class="form-control" placeholder="Ví dụ: Đội Tổng hợp - PX01">
+                        <input type="text" id="user-unit" class="form-control" placeholder="Gõ để tìm, ví dụ: Phòng Cảnh..." autocomplete="off" oninput="filterUnitSuggestions('user-unit', 'user-unit-suggest')" onfocus="filterUnitSuggestions('user-unit', 'user-unit-suggest')">
+                        <div id="user-unit-suggest" class="unit-suggest-box" style="display:none;"></div>
                     </div>
                     <button class="btn btn-primary" onclick="processNewUserRegister()">Đăng Ký & Đăng Nhập</button>
                 </div>
@@ -508,7 +583,7 @@
             </div>
 
             <div class="month-selector-container">
-                <label style="font-size: 14px; font-weight: bold; color: var(--cand-red); flex: 1;">Xem & đăng ký cho:</label>
+                <label style="font-size: 14px; font-weight: bold; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6); flex: 1;">Xem & đăng ký cho:</label>
                 <select id="user-month-select" class="form-control" style="flex: 2; font-weight: bold;" onchange="userChangeMonth()">
                     <!-- Options generated via JS -->
                 </select>
@@ -553,9 +628,10 @@
                 <h2><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Báo Cơm</h2>
                 <div id="historyStaticGrid" class="calendar-grid"></div>
                 <div class="calendar-note" style="margin-top: 15px;">
-                    <div><span class="note-box" style="background-color: rgba(229, 57, 53, 0.15); border-color: var(--cand-red-light);"></span> Đã ăn</div>
-                    <div><span class="note-box" style="background-color: var(--future-eat); border-color: #4caf50;"></span> Sẽ ăn</div>
+                    <div><span class="note-box" style="background-color: rgba(34, 197, 94, 0.15); border: 2px solid var(--cand-red-light); border-style: solid;"></span> Đã ăn</div>
+                    <div><span class="note-box" style="background-color: var(--future-eat); border: 2px solid #4caf50; border-style: dashed;"></span> Sẽ ăn</div>
                     <div><span class="note-box" style="background-color: var(--past-bg); border-color: var(--border-color);"></span> Cắt cơm</div>
+                    <div><span class="note-box" style="background-color: var(--card-bg); border: 3px solid var(--cand-gold);"></span> Hôm nay</div>
                 </div>
             </div>
 
@@ -598,132 +674,177 @@
         <!-- PANEL ADMIN (BẾP TRƯỞNG ĐIỀU HÀNH) -->
         <div id="panel-admin" class="view-panel">
             <div class="card">
-                <h2>THỐNG KÊ TÌNH HÌNH BẾP ĂN</h2>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 120px;">
-                        <label style="font-size:11px; font-weight:bold;">Chia phân đoạn:</label>
-                        <select id="filter-range" class="form-control" onchange="renderAdminMatrix()">
-                            <option value="all">Cả tháng</option>
-                            <option value="t1">Tuần 1 (1-7)</option>
-                            <option value="t2">Tuần 2 (8-14)</option>
-                            <option value="t3">Tuần 3 (15-21)</option>
-                            <option value="t4">Tuần 4 (22-28)</option>
-                            <option value="t5">Tuần 5 (29-31)</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1; min-width: 120px;">
-                        <label style="font-size:11px; font-weight:bold;">Đơn giá bữa (đ):</label>
-                        <input type="number" id="admin-meal-price" class="form-control" value="35000" oninput="renderAdminMatrix()">
-                    </div>
-                    <div style="flex: 1; min-width: 120px;">
-                        <label style="font-size:11px; font-weight:bold;">Tháng quản trị:</label>
-                        <select id="admin-month-select" class="form-control" onchange="fetchFullDatabaseFromSystem()">
-                            <option value="6">Tháng 6/2026</option>
-                            <option value="7">Tháng 7/2026</option>
-                            <option value="8">Tháng 8/2026</option>
-                            <option value="9">Tháng 9/2026</option>
-                            <option value="10">Tháng 10/2026</option>
-                            <option value="11">Tháng 11/2026</option>
-                            <option value="12">Tháng 12/2026</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn btn-success" style="margin-bottom: 15px;" onclick="fetchFullDatabaseFromSystem()">
-                    <i class="fa-solid fa-rotate"></i> Làm Mới Dữ Liệu Bếp
-                </button>
-
-                <h3 style="font-size: 13px; color: var(--cand-red); margin-bottom: 10px; font-weight: bold; border-bottom: 2px solid var(--cand-gold); padding-bottom: 4px;">
-                    <i class="fa-solid fa-chart-pie"></i> THỐNG KÊ QUÂN SỐ BÁO CƠM NHANH (HÔM QUA - HÔM NAY - NGÀY MAI)
-                </h3>
-                <div class="admin-dashboard-grid" id="adminQuickStats"></div>
-
-                <!-- FORM ĐỔI USERNAME / MẬT KHẨU ADMIN TRỰC TIẾP LÊN SHEET "admin" -->
-                <div class="login-sub-card" style="border: 2px solid var(--status-lunch); background-color: var(--card-bg);">
-                    <div class="login-sub-title" style="color: var(--status-lunch);">
-                        <i class="fa-solid fa-user-gear"></i> THAY ĐỔI TÀI KHOẢN ADMIN (LƯU VÀO SHEET)
-                    </div>
-                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
-                        * Thông tin thay đổi dưới đây sẽ trực tiếp cập nhật vào trang tính `admin` của Google Sheets:
-                    </p>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Tên đăng nhập mới:</label>
-                            <input type="text" id="admin-new-username" class="form-control" placeholder="Ví dụ: admin_bep">
+                <!-- ===================== TAB 1: THỐNG KÊ ===================== -->
+                <div id="admin-subtab-panel-stats" class="admin-subtab-panel active">
+                    <h2>THỐNG KÊ TÌNH HÌNH BẾP ĂN</h2>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 120px;">
+                            <label style="font-size:11px; font-weight:bold;">Chia phân đoạn:</label>
+                            <select id="filter-range" class="form-control" onchange="renderAdminMatrix()">
+                                <option value="all">Cả tháng</option>
+                                <option value="t1">Tuần 1 (1-7)</option>
+                                <option value="t2">Tuần 2 (8-14)</option>
+                                <option value="t3">Tuần 3 (15-21)</option>
+                                <option value="t4">Tuần 4 (22-28)</option>
+                                <option value="t5">Tuần 5 (29-31)</option>
+                            </select>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Mật khẩu mới:</label>
-                            <input type="password" id="admin-new-password" class="form-control" placeholder="Mật khẩu bảo mật">
+                        <div style="flex: 1; min-width: 120px;">
+                            <label style="font-size:11px; font-weight:bold;">Đơn giá bữa (đ):</label>
+                            <input type="number" id="admin-meal-price" class="form-control" value="35000" oninput="renderAdminMatrix()">
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <label style="font-size:11px; font-weight:bold;">Tháng quản trị:</label>
+                            <select id="admin-month-select" class="form-control" onchange="fetchFullDatabaseFromSystem()">
+                                <option value="6">Tháng 6/2026</option>
+                                <option value="7">Tháng 7/2026</option>
+                                <option value="8">Tháng 8/2026</option>
+                                <option value="9">Tháng 9/2026</option>
+                                <option value="10">Tháng 10/2026</option>
+                                <option value="11">Tháng 11/2026</option>
+                                <option value="12">Tháng 12/2026</option>
+                            </select>
                         </div>
                     </div>
-                    <button class="btn btn-success" onclick="processAdminChangeCreds()">
-                        <i class="fa-solid fa-floppy-disk"></i> Cập Nhật Tài Khoản Lên Sheet
+                    <button class="btn btn-success" style="margin-bottom: 15px;" onclick="fetchFullDatabaseFromSystem()">
+                        <i class="fa-solid fa-rotate"></i> Làm Mới Dữ Liệu Bếp
                     </button>
-                </div>
 
-                <!-- FORM ADMIN NHẬP BỔ SUNG HOẶC TẠO TÀI KHẨN MỚI TRỰC TIẾP -->
-                <div class="login-sub-card" style="border: 2px solid var(--cand-gold-dark); background-color: var(--alert-bg); margin-top: 15px;">
-                    <div class="login-sub-title" style="color: var(--cand-red);">
-                        <i class="fa-solid fa-user-plus"></i> ĐẶT SUẤT CƠM BỔ SUNG / KHỞI TẠO TÀI KHOẢN HỘ (QUA ZALO)
-                    </div>
-                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
-                        * Nếu số điện thoại này đã có trên Google Sheets, hệ thống sẽ tự động cập nhật ngày được chọn. Nếu chưa có, hệ thống sẽ tạo tài khoản mới với thông tin Họ tên, Đơn vị do Admin điền.
-                    </p>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                        <div class="form-group">
-                            <label>Số điện thoại:</label>
-                            <input type="tel" id="admin-add-phone" class="form-control" placeholder="Ví dụ: 0912xxx">
-                        </div>
-                        <div class="form-group">
-                            <label>Ngày cần báo ăn:</label>
-                            <select id="admin-add-day" class="form-control"></select>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                        <div class="form-group">
-                            <label>Họ và Tên cán bộ:</label>
-                            <input type="text" id="admin-add-name" class="form-control" placeholder="Điền nếu tạo mới">
-                        </div>
-                        <div class="form-group">
-                            <label>Đội / Phòng công tác:</label>
-                            <input type="text" id="admin-add-unit" class="form-control" placeholder="Điền nếu tạo mới">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Chọn chế độ ăn:</label>
-                        <select id="admin-add-status" class="form-control" style="border: 1px solid var(--cand-red); font-weight: bold;">
-                            <option value="LUNCH">🥣 Chỉ ăn Trưa</option>
-                            <option value="DINNER">🌆 Chỉ ăn Tối</option>
-                            <option value="BOTH">🔔 Ăn cả Trưa + Tối</option>
-                            <option value="NONE">❌ Cắt cơm hoàn toàn</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary" onclick="processAdminManualUpdate()">
-                        <i class="fa-solid fa-floppy-disk"></i> Lưu & Đồng Bộ Lên Google Sheets
-                    </button>
-                </div>
-
-                <!-- MA TRẬN TOÀN ĐƠN VỊ -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 8px;">
-                    <h3 id="admin-matrix-title" style="font-size: 13px; color: var(--text-main); font-weight: bold; margin: 0;">
-                        <i class="fa-solid fa-table-cells"></i> Thống Kê Chi Tiết Báo Cơm
+                    <h3 style="font-size: 13px; color: var(--cand-red); margin-bottom: 10px; font-weight: bold; border-bottom: 2px solid var(--cand-gold); padding-bottom: 4px;">
+                        <i class="fa-solid fa-chart-pie"></i> THỐNG KÊ QUÂN SỐ BÁO CƠM NHANH (HÔM QUA - HÔM NAY - NGÀY MAI)
                     </h3>
-                    <button class="btn btn-success" style="width: auto; padding: 6px 12px; font-size: 11px; display: flex; align-items: center; gap: 5px;" onclick="exportTableToExcel('matrix-table', 'ThongKeBepAn')">
-                        <i class="fa-solid fa-file-excel"></i> Xuất Excel
-                    </button>
+                    <div class="admin-dashboard-grid" id="adminQuickStats"></div>
+
+                    <!-- MA TRẬN TOÀN ĐƠN VỊ -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 8px;">
+                        <h3 id="admin-matrix-title" style="font-size: 13px; color: var(--text-main); font-weight: bold; margin: 0;">
+                            <i class="fa-solid fa-table-cells"></i> Thống Kê Chi Tiết Báo Cơm
+                        </h3>
+                        <button class="btn btn-success" style="width: auto; padding: 6px 12px; font-size: 11px; display: flex; align-items: center; gap: 5px;" onclick="exportTableToExcel('matrix-table', 'ThongKeBepAn')">
+                            <i class="fa-solid fa-file-excel"></i> Xuất Excel
+                        </button>
+                    </div>
+                    <div style="font-size: 11px; margin-bottom: 8px; display: flex; gap: 10px; justify-content: flex-start; background: var(--note-bg); padding: 8px; border-radius: 4px; border: 1px solid var(--border-color);">
+                        <span><b style="color: var(--status-lunch);">Trưa</b>: Ăn Trưa</span>
+                        <span><b style="color: var(--status-dinner);">Tối</b>: Ăn Tối</span>
+                        <span><b style="color: var(--status-both);">Cả ngày</b>: Cả 2 Bữa</span>
+                        <span style="color: var(--text-main);"><b>-</b>: Cắt Cơm</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="matrix-table">
+                            <thead id="matrix-head"></thead>
+                            <tbody id="matrix-body"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div style="font-size: 11px; margin-bottom: 8px; display: flex; gap: 10px; justify-content: flex-start; background: var(--note-bg); padding: 8px; border-radius: 4px; border: 1px solid var(--border-color);">
-                    <span><b style="color: var(--status-lunch);">Trưa</b>: Ăn Trưa</span>
-                    <span><b style="color: var(--status-dinner);">Tối</b>: Ăn Tối</span>
-                    <span><b style="color: var(--status-both);">Cả ngày</b>: Cả 2 Bữa</span>
-                    <span style="color: var(--text-main);"><b>-</b>: Cắt Cơm</span>
+
+                <!-- ===================== TAB 2: ĐẶT CƠM BỔ SUNG ===================== -->
+                <div id="admin-subtab-panel-addmeal" class="admin-subtab-panel">
+                    <div class="login-sub-card" style="border: 2px solid var(--cand-gold-dark); background-color: var(--alert-bg);">
+                        <div class="login-sub-title" style="color: var(--cand-red);">
+                            <i class="fa-solid fa-user-plus"></i> ĐẶT SUẤT CƠM BỔ SUNG / KHỞI TẠO TÀI KHOẢN HỘ (QUA ZALO)
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
+                            * Nếu số điện thoại này đã có trên Google Sheets, hệ thống sẽ tự động cập nhật ngày được chọn. Nếu chưa có, hệ thống sẽ tạo tài khoản mới với thông tin Họ tên, Đơn vị do Admin điền.
+                        </p>
+                        <div class="form-group" style="background: var(--card-bg); border: 1px solid var(--cand-gold-dark); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px;">
+                            <label style="font-size:11px; font-weight:bold;">Đặt cơm bổ sung cho tháng:</label>
+                            <select id="admin-add-month-select" class="form-control" style="border: 1px solid var(--cand-gold-dark); font-weight: bold;" onchange="updateAdminAddMonthLabel()">
+                                <option value="6">Tháng 6/2026</option>
+                                <option value="7">Tháng 7/2026</option>
+                                <option value="8">Tháng 8/2026</option>
+                                <option value="9">Tháng 9/2026</option>
+                                <option value="10">Tháng 10/2026</option>
+                                <option value="11">Tháng 11/2026</option>
+                                <option value="12">Tháng 12/2026</option>
+                            </select>
+                            <div style="font-size: 12px; margin-top: 6px; color: var(--cand-red); font-weight: bold;">
+                                <i class="fa-solid fa-circle-info"></i> Đang thao tác đặt/chốt cơm cho <span id="admin-add-month-label">Tháng 8/2026</span>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <div class="form-group">
+                                <label>Số điện thoại:</label>
+                                <input type="tel" id="admin-add-phone" class="form-control" placeholder="Ví dụ: 0912xxx">
+                            </div>
+                            <div class="form-group">
+                                <label>Ngày cần báo ăn:</label>
+                                <select id="admin-add-day" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <div class="form-group">
+                                <label>Họ và Tên cán bộ:</label>
+                                <input type="text" id="admin-add-name" class="form-control" placeholder="Điền nếu tạo mới">
+                            </div>
+                            <div class="form-group" style="position: relative;">
+                                <label>Đội / Phòng công tác:</label>
+                                <input type="text" id="admin-add-unit" class="form-control" placeholder="Điền nếu tạo mới" autocomplete="off" oninput="filterUnitSuggestions('admin-add-unit', 'admin-add-unit-suggest')" onfocus="filterUnitSuggestions('admin-add-unit', 'admin-add-unit-suggest')">
+                                <div id="admin-add-unit-suggest" class="unit-suggest-box" style="display:none;"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Chọn chế độ ăn:</label>
+                            <select id="admin-add-status" class="form-control" style="border: 1px solid var(--cand-red); font-weight: bold;">
+                                <option value="LUNCH">🥣 Chỉ ăn Trưa</option>
+                                <option value="DINNER">🌆 Chỉ ăn Tối</option>
+                                <option value="BOTH">🔔 Ăn cả Trưa + Tối</option>
+                                <option value="NONE">❌ Cắt cơm hoàn toàn</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="processAdminManualUpdate()">
+                            <i class="fa-solid fa-floppy-disk"></i> Lưu & Đồng Bộ Lên Google Sheets
+                        </button>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table id="matrix-table">
-                        <thead id="matrix-head"></thead>
-                        <tbody id="matrix-body"></tbody>
-                    </table>
+
+                <!-- ===================== TAB 3: TÀI KHOẢN ADMIN ===================== -->
+                <div id="admin-subtab-panel-account" class="admin-subtab-panel">
+                    <div class="login-sub-card" style="border: 2px solid var(--status-lunch); background-color: var(--card-bg);">
+                        <div class="login-sub-title" style="color: var(--status-lunch);">
+                            <i class="fa-solid fa-user-gear"></i> THAY ĐỔI TÀI KHOẢN ADMIN (LƯU VÀO SHEET)
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
+                            * Thông tin thay đổi dưới đây sẽ trực tiếp cập nhật vào trang tính `admin` của Google Sheets:
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Tên đăng nhập mới:</label>
+                                <input type="text" id="admin-new-username" class="form-control" placeholder="Ví dụ: admin_bep">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Mật khẩu mới:</label>
+                                <input type="password" id="admin-new-password" class="form-control" placeholder="Mật khẩu bảo mật">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="processAdminChangeCreds()">
+                            <i class="fa-solid fa-floppy-disk"></i> Cập Nhật Tài Khoản Lên Sheet
+                        </button>
+                    </div>
                 </div>
-                
+
+                <!-- ===================== TAB 4: DANH MỤC ĐƠN VỊ ===================== -->
+                <div id="admin-subtab-panel-units" class="admin-subtab-panel">
+                    <div class="login-sub-card" style="border: 2px solid var(--cand-red); background-color: var(--card-bg);">
+                        <div class="login-sub-title" style="color: var(--cand-red);">
+                            <i class="fa-solid fa-sitemap"></i> QUẢN LÝ DANH MỤC ĐỘI / PHÒNG CÔNG TÁC
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">
+                            * Danh sách đơn vị Admin thêm tại đây sẽ hiển thị cho chiến sĩ chọn (có tìm kiếm) tại mục "Đội / Phòng công tác" khi đăng ký lần đầu.
+                        </p>
+                        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                            <input type="text" id="admin-new-unit-name" class="form-control" placeholder="Ví dụ: Phòng Cảnh sát giao thông" onkeydown="if(event.key==='Enter'){event.preventDefault(); addUnitToCatalog();}">
+                            <button class="btn btn-primary" style="width: auto; padding: 8px 16px; white-space: nowrap;" onclick="addUnitToCatalog()">
+                                <i class="fa-solid fa-plus"></i> Thêm
+                            </button>
+                        </div>
+                        <div id="admin-unit-list" style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg);"></div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">
+                            Tổng số đơn vị: <b id="admin-unit-count">0</b>
+                        </div>
+                    </div>
+                </div>
+
                 <button class="btn btn-outline" style="margin-top: 15px;" onclick="exitAdminView()">Thoát Quyền Quản Lý</button>
             </div>
         </div>
@@ -762,9 +883,167 @@
         </div>
     </div>
 
+    <!-- THANH TAB CỐ ĐỊNH DƯỚI CÙNG CHO GIAO DIỆN ADMIN (dễ vuốt chọn trên điện thoại) -->
+    <div class="nav-tabs" id="adminBottomNav">
+        <div id="admin-subtab-btn-stats" class="tab-item admin-subtab-btn active" onclick="showAdminSubTab('stats')">
+            <i class="fa-solid fa-chart-column"></i><span>Thống Kê</span>
+        </div>
+        <div id="admin-subtab-btn-addmeal" class="tab-item admin-subtab-btn" onclick="showAdminSubTab('addmeal')">
+            <i class="fa-solid fa-user-plus"></i><span>Đặt Cơm</span>
+        </div>
+        <div id="admin-subtab-btn-account" class="tab-item admin-subtab-btn" onclick="showAdminSubTab('account')">
+            <i class="fa-solid fa-user-gear"></i><span>Tài Khoản</span>
+        </div>
+        <div id="admin-subtab-btn-units" class="tab-item admin-subtab-btn" onclick="showAdminSubTab('units')">
+            <i class="fa-solid fa-sitemap"></i><span>Đơn Vị</span>
+        </div>
+    </div>
+
     <script>
         // MÃ WEB_APP_URL BẮT BUỘC TRÙNG VỚI LINK TRIỂN KHAI APPS SCRIPT
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwSmd7dtp8m_honCKMoiTUhWAVEcgInZxHYTlvCxNC9Qy_4Cy9wN2Q23CtethdMs4qZhA/exec";
+
+        // ===================== QUẢN LÝ DANH MỤC ĐƠN VỊ (ĐỘI / PHÒNG CÔNG TÁC) =====================
+        // Danh sách đơn vị được lưu cục bộ trên thiết bị (localStorage), đồng thời cố gắng
+        // đồng bộ hai chiều với Google Sheets qua WEB_APP_URL (sheet "DanhMucDonVi") nếu Apps Script
+        // đã được cấu hình hỗ trợ 2 action: "get_units" và "save_units" (xem hướng dẫn cuối file).
+        const UNIT_STORAGE_KEY = 'kitchenUnitCatalog';
+        let unitCatalog = [];
+
+        function loadUnitCatalogLocal() {
+            try {
+                const raw = localStorage.getItem(UNIT_STORAGE_KEY);
+                unitCatalog = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(unitCatalog)) unitCatalog = [];
+            } catch (e) {
+                unitCatalog = [];
+            }
+        }
+
+        function saveUnitCatalogLocal() {
+            localStorage.setItem(UNIT_STORAGE_KEY, JSON.stringify(unitCatalog));
+        }
+
+        // Đồng bộ danh mục đơn vị lên Google Sheets (best-effort, không chặn thao tác của Admin
+        // nếu Apps Script chưa hỗ trợ action này — lỗi sẽ bị bỏ qua âm thầm).
+        function syncUnitCatalogToServer() {
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: "save_units", units: unitCatalog })
+            }).catch(() => {});
+        }
+
+        // Tải danh mục đơn vị từ Google Sheets khi mở app (nếu server hỗ trợ), gộp với dữ liệu cục bộ.
+        function fetchUnitCatalogFromServer() {
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: "get_units" })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res && res.status === "success" && Array.isArray(res.units) && res.units.length > 0) {
+                    const merged = Array.from(new Set([...unitCatalog, ...res.units])).sort((a, b) => a.localeCompare(b, 'vi'));
+                    unitCatalog = merged;
+                    saveUnitCatalogLocal();
+                    renderAdminUnitCatalog();
+                }
+            })
+            .catch(() => { /* Server chưa hỗ trợ danh mục đơn vị -> chỉ dùng dữ liệu cục bộ */ });
+        }
+
+        function addUnitToCatalog() {
+            triggerHaptic();
+            const input = document.getElementById('admin-new-unit-name');
+            const name = input.value.trim();
+            if (!name) { customAlert("Vui lòng nhập tên đơn vị.", "error"); return; }
+            const exists = unitCatalog.some(u => u.toLowerCase() === name.toLowerCase());
+            if (exists) { customAlert("Đơn vị này đã có trong danh mục.", "error"); return; }
+            unitCatalog.push(name);
+            unitCatalog.sort((a, b) => a.localeCompare(b, 'vi'));
+            saveUnitCatalogLocal();
+            syncUnitCatalogToServer();
+            renderAdminUnitCatalog();
+            input.value = "";
+            input.focus();
+        }
+
+        function removeUnitFromCatalog(index) {
+            triggerHaptic();
+            const name = unitCatalog[index];
+            showConfirmDialog(`Xóa đơn vị "${name}" khỏi danh mục?`, function() {
+                unitCatalog.splice(index, 1);
+                saveUnitCatalogLocal();
+                syncUnitCatalogToServer();
+                renderAdminUnitCatalog();
+            });
+        }
+
+        function renderAdminUnitCatalog() {
+            const box = document.getElementById('admin-unit-list');
+            const countEl = document.getElementById('admin-unit-count');
+            if (!box) return;
+            if (countEl) countEl.innerText = unitCatalog.length;
+            if (unitCatalog.length === 0) {
+                box.innerHTML = `<div class="unit-suggest-empty">Chưa có đơn vị nào. Hãy thêm đơn vị đầu tiên ở trên.</div>`;
+                return;
+            }
+            box.innerHTML = unitCatalog.map((name, idx) => `
+                <div class="admin-unit-row">
+                    <span>${name}</span>
+                    <button class="del-unit-btn" onclick="removeUnitFromCatalog(${idx})" title="Xóa đơn vị">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Bộ lọc gợi ý tìm kiếm theo danh sách (dùng chung cho ô đăng ký người dùng và ô admin nhập nhanh)
+        function filterUnitSuggestions(inputId, boxId) {
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(boxId);
+            if (!input || !box) return;
+            const keyword = input.value.trim().toLowerCase();
+
+            if (unitCatalog.length === 0) {
+                box.style.display = 'none';
+                return;
+            }
+
+            const matches = keyword
+                ? unitCatalog.filter(u => u.toLowerCase().includes(keyword))
+                : unitCatalog;
+
+            if (matches.length === 0) {
+                box.innerHTML = `<div class="unit-suggest-empty">Không tìm thấy đơn vị phù hợp. Có thể tự nhập tên đơn vị.</div>`;
+                box.style.display = 'block';
+                return;
+            }
+
+            box.innerHTML = matches.slice(0, 50).map(name =>
+                `<div class="unit-suggest-item" onmousedown="selectUnitSuggestion('${inputId}','${boxId}', this)">${name}</div>`
+            ).join('');
+            box.style.display = 'block';
+        }
+
+        function selectUnitSuggestion(inputId, boxId, el) {
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(boxId);
+            input.value = el.innerText;
+            box.style.display = 'none';
+            triggerHaptic();
+        }
+
+        // Ẩn hộp gợi ý khi bấm ra ngoài
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.unit-suggest-box').forEach(box => {
+                if (!box.previousElementSibling || (!box.previousElementSibling.contains(e.target) && !box.contains(e.target))) {
+                    box.style.display = 'none';
+                }
+            });
+        });
+        // ===================== HẾT KHỐI QUẢN LÝ DANH MỤC ĐƠN VỊ =====================
 
         // CẤU HÌNH THỜI GIAN THỰC
         const configLockHour = 8;
@@ -789,6 +1068,8 @@
         
         window.onload = function() {
             initThemeIcon();
+            loadUnitCatalogLocal();
+            fetchUnitCatalogFromServer();
             
             const realDateObj = new Date();
             const currentRealMonth = realDateObj.getMonth() + 1; 
@@ -943,6 +1224,8 @@
             const savedName = localStorage.getItem('userName');
             const savedUnit = localStorage.getItem('userUnit');
             const bottomNav = document.getElementById('bottomNav');
+            const adminBottomNav = document.getElementById('adminBottomNav');
+            if (adminBottomNav) adminBottomNav.style.display = 'none';
 
             document.getElementById('mainHeader').style.background = "linear-gradient(135deg, var(--cand-red), #7f0000)";
             document.getElementById('headerTitle').innerText = "HỆ THỐNG BÁO CƠM TẬP THỂ CAND";
@@ -1315,6 +1598,7 @@
             for (let d = 1; d <= totalDaysInHistoryMonth; d++) {
                 const cell = document.createElement('div');
                 cell.className = 'calendar-cell';
+                if (isCurrentMonthActive && d === todayDate) cell.classList.add('history-cell-today');
                 
                 const dayNumSpan = document.createElement('span');
                 dayNumSpan.className = 'day-num';
@@ -1418,7 +1702,7 @@
             document.getElementById('total-money').innerText = moneyTotal.toLocaleString('vi-VN') + " đ";
         }
 
-        function showAdminLoginForm() { triggerHaptic(); hideAllPanels(); document.getElementById('panel-admin-login').classList.add('active'); }
+        function showAdminLoginForm() { triggerHaptic(); hideAllPanels(); document.getElementById('panel-admin-login').classList.add('active'); const abn = document.getElementById('adminBottomNav'); if (abn) abn.style.display = 'none'; }
 
         function verifyAdminLogin() {
             triggerHaptic();
@@ -1437,12 +1721,17 @@
                 if (response.status === "success") {
                     customAlert("Xác thực quyền Quản lý bếp ăn thành công!");
                     document.getElementById('mainHeader').style.background = "linear-gradient(135deg, #212121, #000)";
-                    document.getElementById('headerTitle').innerText = "ĐIỀU HÀNH BẾP ĂN QUẢN LÝ (ADMIN)";
+                    document.getElementById('headerTitle').innerText = "ĐIỀU HÀNH BẾP ĂN (ADMIN)";
                     hideAllPanels();
                     document.getElementById('panel-admin').classList.add('active');
+                    document.getElementById('adminBottomNav').style.display = 'flex';
                     
                     document.getElementById('admin-month-select').value = activeMonth.toString();
+                    document.getElementById('admin-add-month-select').value = activeMonth.toString();
+                    updateAdminAddMonthLabel();
+                    showAdminSubTab('stats');
                     fetchFullDatabaseFromSystem();
+                    renderAdminUnitCatalog();
                 } else {
                     customAlert(response.error || "Sai tài khoản hoặc mật mã an toàn!", "error");
                 }
@@ -1724,7 +2013,7 @@
             const status = document.getElementById('admin-add-status').value;
             const manualName = document.getElementById('admin-add-name').value.trim();
             const manualUnit = document.getElementById('admin-add-unit').value.trim();
-            const adminMonth = document.getElementById('admin-month-select').value;
+            const adminMonth = document.getElementById('admin-add-month-select').value;
 
             if (!phone || !day) { customAlert("Đồng chí vui lòng điền Số điện thoại và chọn Ngày cần chốt bổ sung!", "error"); return; }
             showLoading(true);
@@ -1823,6 +2112,24 @@
         }
 
         function exitAdminView() { triggerHaptic(); document.getElementById('admin-password').value = ""; checkAuthGate(); }
+
+        // Chuyển đổi giữa các tab con trong giao diện Admin (Thống kê / Đặt cơm bổ sung / Tài khoản / Danh mục đơn vị)
+        function showAdminSubTab(tabId) {
+            triggerHaptic();
+            document.querySelectorAll('.admin-subtab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.admin-subtab-btn').forEach(b => b.classList.remove('active'));
+            const panel = document.getElementById(`admin-subtab-panel-${tabId}`);
+            const btn = document.getElementById(`admin-subtab-btn-${tabId}`);
+            if (panel) panel.classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        // Cập nhật dòng nhãn "Đang thao tác đặt/chốt cơm cho Tháng .../2026" trong tab Đặt Cơm Bổ Sung
+        function updateAdminAddMonthLabel() {
+            const sel = document.getElementById('admin-add-month-select');
+            const label = document.getElementById('admin-add-month-label');
+            if (sel && label) label.innerText = `Tháng ${sel.value}/2026`;
+        }
         
         function showPanel(panelId) {
             triggerHaptic();
